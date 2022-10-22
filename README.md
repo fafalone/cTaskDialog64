@@ -17,4 +17,6 @@ You'll need to add LongPtr support to use this codebase in VB6/VBA6. This thread
 This project will work with VB6, VBA6, VBA7 x86/x64, and twinBASIC x86/x64,. Regardless of the project type, you'll need Common Controls 6.0 enabled via manifest.
 
 ### Source Code
-The class itself can be found in the Export\Sources folder, along with the exported twinBASIC Demo form. The Export/Resources folder has a manifest for comtl6 if you need it.
+The class itself can be found in the Export\Sources folder, along with the exported twinBASIC Demo form. The Export\Resources folder has a manifest for comtl6 if you need it.
+
+To use this outside of twinBASIC, you'll need cTaskDialog.cls and modTDHelper.bas from the Export\Sources folder. Both must be added to a project.
