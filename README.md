@@ -20,3 +20,11 @@ This project will work with VB6, VBA6, VBA7 x86/x64, and twinBASIC x86/x64,. Reg
 The class itself can be found in the Export\Sources folder, along with the exported twinBASIC Demo form. The Export\Resources folder has a manifest for comtl6 if you need it.
 
 To use this outside of twinBASIC, you'll need cTaskDialog.cls and modTDHelper.bas from the Export\Sources folder. Both must be added to a project.
+
+### Customizations
+This class is more than just a straight implementation of the native features (though it supports all of those and can be used with just a few lines for very simply dialogs), it also features custom flags that add additional control types: TextBox, ComboBox (with images), Date/Time, and Slider, all of which can be positioned in either the top region, by the buttons, or in the footer, and can be mixed and matched with eachother and all the built in features. There's also an option to add a logo image in the top right and a few other places. Follow the link to the VBForums thread up top for more pictures and demos of how these work (all the demos are in the Demo Project in the source).
+
+![Screenshot4](https://i.imgur.com/1ApJRg1.jpg) ![Screenshot5](https://i.imgur.com/RW6XlJh.jpg)
+
+![Screenshot6](https://i.imgur.com/FGIPojS.jpg) ![Screenshot6](https://i.imgur.com/xcbkWSB.jpg)
+
