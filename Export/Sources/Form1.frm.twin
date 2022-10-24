@@ -809,7 +809,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     With TaskDialog1
         .Init
         .MainInstruction = "Sup"
-        .Content = "Note that if you want date/time in the buttons, there may not be enough room depending on number of buttons and whether there's checkboxes." '& vbCrLf & vbCrLf
+        .Content = "Note that if you want date/time in the buttons, there may not be enough room depending on number of buttons and whether there's checkboxes. This examples manually sets the width because they'd be truncated otherwise." '& vbCrLf & vbCrLf
         .Flags = TDF_DATETIME
         .DateTimeType = dttDateTimeWithCheck 'TimeOnly
         .DateTimeAlign = TDIBA_Buttons
@@ -817,6 +817,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .IconMain = TD_INFORMATION_ICON
         .Title = "cTaskDialog Project"
         .ParenthWnd = Me.hWnd
+        .Width = 300
         .ShowDialog
     
         Label11.Caption = .ResultDateTime
@@ -1056,8 +1057,12 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     dTimeMax = DateAdd("h", 4, dTimeMax)
         Dim hBmp As LongPtr
         Dim sImg As String
-        sImg = App.Path & "\disc32.png"
         Dim CX As Long, CY As Long
+        If TaskDialog1.DPIScaleX > 1 Then
+            sImg = App.Path & "\disc48.png"
+        Else
+        	sImg = App.Path & "\disc32.png"
+        End If
         hBmp = hBitmapFromFile(sImg, CX, CY)
     '    hBmp = LoadImageW(0, StrPtr(simg), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE)
         Debug.Print "hBmp=" & hBmp '& ",cx=" & cx & ",cy=" & cy
@@ -1478,7 +1483,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     
     End Sub
     
-    Private Sub TaskDialog2_DialogConstucted(ByVal hWnd As Long)
+    Private Sub TaskDialog2_DialogConstucted(ByVal hWnd As LongPtr)
     Debug.Print "TaskDialog2_DialogConstucted"
     
     End Sub

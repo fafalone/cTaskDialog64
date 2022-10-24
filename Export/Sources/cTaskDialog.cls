@@ -12,6 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+
 '*********************************
 'cTaskDialog v1.2 R2 X64 Version
 'by Jon Johnson (aka fafalone)
@@ -49,6 +50,15 @@ Option Explicit
 '
 '*********************************
 'VERSION HISTORY
+'Version 1.2.2 Universal
+'-The Init routine now sets the default date/time
+'-The Logo B demo now shows querying the DPI to load a larger image for scaling > 100%.
+'Bug fix: Various corrections for scaling >100%, including systems where the default GUI font from
+'         GetStockObject and WM_GETFONT didn't apply DPI scaling.
+'Bug fix: Multi-page navigation back to a previous page causes behavior differences.
+'Bug fix: Somehow a typo changed a - to an = in AddLogoImage, breaking right alignment positioning
+'         and transparency.
+'
 'Version 1.2.1 Universal
 'Bug fix: Commented out PackingAlignment attribute for non-twinBASIC projects and implemented
 '         manually packed/set structure for VBA7/64, the only place where extra alignment bytes
@@ -264,6 +274,7 @@ Private Const WS_EX_LAYERED = &H80000
 
 Private Const DEFAULT_GUI_FONT = 17
 Private Const WM_SETFONT                    As Long = &H30
+Private Const WM_GETFONT = &H31
 Private Const WM_GETTEXTLENGTH = &HE
 Private Const WM_GETTEXT = &HD
 Private Const WM_SETTEXT As Long = &HC
@@ -736,6 +747,8 @@ Private Declare PtrSafe Function GetDeviceCaps Lib "gdi32" (ByVal hDC As LongPtr
 Private Declare PtrSafe Function DefSubclassProc Lib "comctl32.dll" Alias "#413" (ByVal hWnd As LongPtr, ByVal uMsg As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr) As LongPtr
 Private Declare PtrSafe Function SetWindowSubclass Lib "comctl32.dll" Alias "#410" (ByVal hWnd As LongPtr, ByVal pfnSubclass As LongPtr, ByVal uIdSubclass As LongPtr, Optional ByVal dwRefData As LongPtr) As Long
 Private Declare PtrSafe Function RemoveWindowSubclass Lib "comctl32.dll" Alias "#412" (ByVal hWnd As LongPtr, ByVal pfnSubclass As LongPtr, ByVal uIdSubclass As LongPtr) As Long
+Private Declare PtrSafe Function SystemParametersInfoW Lib "user32" (ByVal uiAction As Long, ByVal uiParam As Long, pvParam As Any, ByVal fWinIni As Long) As Long
+Private Declare PtrSafe Function CreateFontIndirectW Lib "gdi32" (ByRef lpLogFont As LOGFONTW) As LongPtr
 #If Win64 Then
 Private Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongPtrW" (ByVal hWnd As LongPtr, ByVal nIndex As Long) As LongPtr
 Private Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongPtrW" (ByVal hWnd As LongPtr, ByVal nIndex As Long, ByVal dwNewLong As LongPtr) As LongPtr
@@ -801,6 +814,8 @@ Private Declare Function GetWindowLong Lib "user32" Alias "GetWindowLongA" (ByVa
 Private Declare Function SetWindowLong Lib "user32" Alias "SetWindowLongA" (ByVal hWnd As Long, ByVal nIndex As GWL_nIndex, ByVal dwNewLong As Long) As Long
 Private Declare Function WideCharToMultiByte Lib "kernel32" (ByVal codepage As Long, ByVal dwFlags As Long, lpWideCharStr As Any, ByVal cchWideChar As Long, lpMultiByteStr As Any, ByVal cchMultiByte As Long, ByVal lpDefaultChar As String, ByVal lpUsedDefaultChar As Long) As Long
 Private Declare Function lstrlenW Lib "kernel32" (lpString As Any) As Long
+Private Declare Function SystemParametersInfoW Lib "user32" (ByVal uiAction As Long, ByVal uiParam As Long, pvParam As Any, ByVal fWinIni As Long) As Long
+Private Declare Function CreateFontIndirectW Lib "gdi32" (ByRef lpLogFont As LOGFONTW) As Long
 #End If
 
 Private Const CP_ACP = 0        ' ANSI code page
@@ -1028,7 +1043,84 @@ Private m_cbEnum As Long
 '----------------------------END DECLARE SECTION---------------------------
 '
 '***************************************************************************
+Private m_hFontDisp As LongPtr
+Private Const ANSI_CHARSET As Byte = &H0
+Private Const DEFAULT_CHARSET As Byte = &H1
 
+Private Const DEFAULT_PITCH = 0
+Private Const FIXED_PITCH = 1
+Private Const VARIABLE_PITCH As Integer = 2
+
+Private Const FF_DONTCARE = 0
+Private Const FF_ROMAN = 16
+Private Const FF_SWISS = 32
+Private Const FF_MODERN = 48
+Private Const FF_SCRIPT = 64
+Private Const FF_DECORATIVE = 80
+
+
+Private Const DEFAULT_QUALITY As Byte = (0)
+Private Const DRAFT_QUALITY As Byte = (1)
+Private Const PROOF_QUALITY As Byte = (2)
+Private Const NONANTIALIASED_QUALITY As Byte = (3)
+Private Const ANTIALIASED_QUALITY As Byte = (4)
+Private Const CLEARTYPE_QUALITY As Byte = (5)
+Private Const CLEARTYPE_NATURAL_QUALITY As Byte = (6)
+
+Private Enum FontWeight
+        FW_DONTCARE = 0
+        FW_THIN = 100
+        FW_EXTRALIGHT = 200
+        FW_LIGHT = 300
+        FW_NORMAL = 400
+        FW_MEDIUM = 500
+        FW_SEMIBOLD = 600
+        FW_BOLD = 700
+        FW_EXTRABOLD = 800
+        FW_HEAVY = 900
+        FW_ULTRALIGHT = FW_EXTRALIGHT
+        FW_REGULAR = FW_NORMAL
+        FW_DEMIBOLD = FW_SEMIBOLD
+        FW_ULTRABOLD = FW_EXTRABOLD
+        FW_BLACK = FW_HEAVY
+End Enum
+Private Const LF_FACESIZE = 32
+Private Type LOGFONTW
+    LFHeight As Long
+    LFWidth As Long
+    LFEscapement As Long
+    LFOrientation As Long
+    LFWeight As Long
+    LFItalic As Byte
+    LFUnderline As Byte
+    LFStrikeOut As Byte
+    LFCharset As Byte
+    LFOutPrecision As Byte
+    LFClipPrecision As Byte
+    LFQuality As Byte
+    LFPitchAndFamily As Byte
+    LFFaceName(0 To (LF_FACESIZE - 1)) As Integer
+End Type
+
+Private Type NONCLIENTMETRICSW
+   cbSize As Long
+   iBorderWidth As Long
+   iScrollWidth As Long
+   iScrollHeight As Long
+   iCaptionWidth As Long
+   iCaptionHeight As Long
+   lfCaptionFont As LOGFONTW
+   iSMCaptionWidth As Long
+   iSMCaptionHeight As Long
+   lfSMCaptionFont As LOGFONTW
+   iMenuWidth As Long
+   iMenuHeight As Long
+   lfMenuFont As LOGFONTW
+   lfStatusFont As LOGFONTW
+   lfMessageFont As LOGFONTW
+   iPaddedBorderWidth As Long
+End Type
+Private Const SPI_GETNONCLIENTMETRICS = &H29
 
 Private Function GetStrFromPtrW(lpszW As LongPtr) As String
   Dim sRtn As String
@@ -1928,14 +2020,14 @@ nComboIdx = -1
     ReDim m_uButtons_VBA7(uTDC.cButtons)
     Dim i As Long
     If uTDC.cButtons Then
-        For i to uTDC.cButtons - 1
+        For i = 0 to uTDC.cButtons - 1
             CopyMemory m_uButtons_VBA7(i).data(0), m_uButtons(i).nButtonID, 4
             CopyMemory m_uButtons_VBA7(i).data(4), m_uButtons(i).pszButtonText, 8
         next i
     End If
     ReDim m_uRadioButtons_VBA7(uTDC.cRadioButtons)
     If uTDC.cRadioButtons Then
-        For i to uTDC.cRadioButtons - 1
+        For i = 0 to uTDC.cRadioButtons - 1
             CopyMemory m_uRadioButtons_VBA7(i).data(0), m_uRadioButtons(i).nButtonID, 4
             CopyMemory m_uRadioButtons_VBA7(i).data(4), m_uRadioButtons(i).pszButtonText, 8
         next i
@@ -2131,6 +2223,7 @@ lSliderChangeS = 1
 lSliderChangeL = 2
 nSliderTickStyle = 0
 nBreaksAdded = 0
+
 With uTDC
     .CXWidth = 0
     .dwCommonButtons = 0
@@ -2408,10 +2501,22 @@ End Function
 
 Private Sub Class_Initialize()
 Dim hDC As LongPtr
+Dim dpi As Long
 hDC = GetDC(0&)
+dpi = GetDeviceCaps(hDC, LOGPIXELSY)
 m_ScaleX = GetDeviceCaps(hDC, LOGPIXELSX) / 96
-m_ScaleY = GetDeviceCaps(hDC, LOGPIXELSY) / 96
+m_ScaleY = dpi / 96
 ReleaseDC 0&, hDC
+Dim nci As NONCLIENTMETRICSW
+Dim tLF As LOGFONTW
+Dim lRet As Long
+nci.cbSize = LenB(nci)
+lRet = SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, LenB(nci), nci, 0)
+If lRet Then
+	nci.lfMessageFont.LFHeight = -((9 * dpi) / 72)
+    m_hFontDisp = CreateFontIndirectW(nci.lfMessageFont)
+End If
+If m_hFontDisp = 0 Then m_hFontDisp = GetStockObject(DEFAULT_GUI_FONT) 'fallback
 ReDim m_uButtons(0)
 ReDim m_uRadioButtons(0)
 ReDim btnCaps(0)
@@ -2444,6 +2549,7 @@ End Sub
 Private Sub Class_Terminate()
 If hShell32 Then FreeLibrary hShell32
 If hImageRes Then FreeLibrary hImageRes
+DeleteObject m_hFontDisp
 End Sub
 
 Public Function NavigatePage(cTD As cTaskDialog) As Long
@@ -2610,14 +2716,14 @@ End If
 
     ReDim uBTN_VBA7(uTDC2.cButtons)
     If uTDC2.cButtons Then
-        For i to uTDC2.cButtons - 1
+        For i = 0 to uTDC2.cButtons - 1
             CopyMemory uBTN_VBA7(i).data(0), uBTN(i).nButtonID, 4
             CopyMemory uBTN_VBA7(i).data(4), uBTN(i).pszButtonText, 8
         next i
     End If
     ReDim m_uRadioButtons_VBA7(uTDC2.cRadioButtons)
     If uTDC2.cRadioButtons Then
-        For i to uTDC2.cRadioButtons - 1
+        For i = 0 to uTDC2.cRadioButtons - 1
             CopyMemory uRBN_VBA7(i).data(0), uRBN(i).nButtonID, 4
             CopyMemory uRBN_VBA7(i).data(4), uRBN(i).pszButtonText, 8
         next i
@@ -2636,95 +2742,7 @@ End If
 End With
 
 'Copy all user-set data from the new TD into this one, since it takes over
-    bPosUsed(0) = False
-    bPosUsed(1) = False
-    bPosUsed(2) = False
-    Me.PageIndex = cTD.PageIndex
-    Me.Flags = cTD.Flags
-    Me.InputAlign = cTD.InputAlign
-    Me.InputAlignInFooter = cTD.InputAlignInFooter
-    Me.InputBoxTextAlign = cTD.InputBoxTextAlign
-    Me.InputCueBanner = cTD.InputCueBanner
-    Me.InputIsPassword = cTD.InputIsPassword
-    Me.InputOffsetX = cTD.InputOffsetX
-    Me.InputText = cTD.InputText
-    Me.InputWidth = cTD.InputWidth
-    Me.AutocloseTime = cTD.AutocloseTime
-    Me.ComboAlign = cTD.ComboAlign
-    Me.ComboAlignInFooter = cTD.ComboAlignInFooter
-    Me.ComboCueBanner = cTD.ComboCueBanner
-    Me.ComboDropWidth = cTD.ComboDropWidth
-    Me.ComboHeight = cTD.ComboHeight
-    Me.ComboImageList = cTD.ComboImageList
-    Me.ComboIndex = cTD.ComboIndex
-    Me.ComboOffsetX = cTD.ComboOffsetX
-    Me.ComboStyle = cTD.ComboStyle
-    Dim cbT() As String, cbI() As Long, cbO() As Long, nct As Long
-    cTD.zzComboGetItemData nct, cbT, cbI, cbO
-    ReDim aComboItems(nct)
-    For i = 0 To nct
-        aComboItems(i).sText = cbT(i)
-        aComboItems(i).iImage = cbI(i)
-        aComboItems(i).iOverlay = cbO(i)
-    Next i
-    nComboInit = cTD.zzComboGetInitialItem()
-    Dim s1 As String, n1 As Long, n2 As Long, b1 As Boolean
-    zzComboGetInitialState s1, n1, n2, b1
-    bCBInitValid = b1
-    tComboInit.sText = s1: tComboInit.iImage = n1: tComboInit.iOverlay = n2
-    Me.DateTimeAlign = cTD.DateTimeAlign
-    Me.DateTimeAlignInButtons = cTD.DateTimeAlignInButtons
-    Me.DateTimeAlignInContent = cTD.DateTimeAlignInContent
-    Me.DateTimeAlignInFooter = cTD.DateTimeAlignInFooter
-    Me.DateTimeChecked = cTD.DateTimeChecked
-    Me.DateTimeOffsetX = cTD.DateTimeOffsetX
-    Dim dt1() As Integer
-    cTD.zzDateTimeGetInitial b1, dt1
-    bDTSetInit = b1
-    With tDTInitial
-            .wDay = dt1(0)
-            .wMonth = dt1(1)
-            .wYear = dt1(2)
-            .wHour = dt1(3)
-            .wMinute = dt1(4)
-            .wSecond = dt1(5)
-    End With
-    Dim dt2() As Integer, b2 As Boolean
-    cTD.zzDateTimeGetRange b1, b2, dt1, dt2
-    bDTSetMin = b1: bDTSetMax = b2
-    With tDTRange(0)
-            .wDay = dt1(0)
-            .wMonth = dt1(1)
-            .wYear = dt1(2)
-            .wHour = dt1(3)
-            .wMinute = dt1(4)
-            .wSecond = dt1(5)
-    End With
-    With tDTRange(1)
-            .wDay = dt2(0)
-            .wMonth = dt2(1)
-            .wYear = dt2(2)
-            .wHour = dt2(3)
-            .wMinute = dt2(4)
-            .wSecond = dt2(5)
-    End With
-    Me.DateTimeType = cTD.DateTimeType
-    lBtnHold = cTD.zzGetButtonHolds()
-    lBtnElv = cTD.zzGetButtonElevated(b1)
-    bElv = b1
-'    icoDataN = cTD.zzGetCommonButtonIcon()
-    cTD.zzGetLogoImage hLogoImage, nLogoType, nLogoPos, lLogoX, lLogoY
-    nSplitButtonID = cTD.zzGetSplitButton
-    m_BtnLRSize = cTD.zzGetWindowsButtonIconSize
-    Me.SliderAlign = cTD.SliderAlign
-    Me.SliderAlignInFooter = cTD.SliderAlignInFooter
-    Me.SliderOffsetX = cTD.SliderOffsetX
-    cTD.zzSliderGetChangeValues lSliderChangeS, lSliderChangeL
-    cTD.zzSliderGetRange lSliderMin, lSliderMax, lSliderNTicks
-    Me.SliderTickStyle = cTD.SliderTickStyle
-    Me.SliderValue = cTD.SliderValue
-    Me.SliderWidth = cTD.SliderWidth
-     
+
     
     #If (VBA7 <> 0) And (TWINBASIC = 0) And (Win64 <> 0) Then
     Call SendMessageW(m_TDhWnd, TDM_NAVIGATE_PAGE, 0, uTDC2_VBA7)
@@ -3109,6 +3127,7 @@ If nDateTimeAlign = TDIBA_Footer Then
     
     If (m_sFooter = "") Or (m_sFooter = "$input") Then
         m_sFooter = " "
+        DebugAppend "Updated footer"
         Call SendMessageW(m_TDhWnd, TDM_UPDATE_ELEMENT_TEXT, TDE_FOOTER, ByVal StrPtr(m_sFooter))
     End If
 ElseIf nDateTimeAlign = TDIBA_Content Then
@@ -3204,7 +3223,8 @@ lEditX = lEditX + DTOffX
                                        hUI, IDD_DT2, App.hInstance, ByVal 0&)
         End If
         
-        hFont = GetStockObject(DEFAULT_GUI_FONT)
+        'hFont = GetStockObject(DEFAULT_GUI_FONT)
+        hFont = m_hFontDisp
         If hFont Then
             SendMessageW hDateTime, WM_SETFONT, hFont, ByVal 0&
             If hDateTime2 Then
@@ -3258,19 +3278,19 @@ If nInputAlign = TDIBA_Footer Then
     Select Case nIBFooterAlign
     
         Case tdcaLeft
-            lEditX = (16 * m_ScaleX) + 16 '32
+            lEditX = (16 * m_ScaleX) * 2 '32
         Case tdcaCenter
             lEditX = ((16 * m_ScaleX) + 16) + (((tRC.Right - ((16 * m_ScaleX) + 16) - 10) - (cxEdit)) \ 2)
         Case tdcaRight
             lEditX = tRC.Right - (cxEdit) - 10
     End Select    'lEditY = tRC.Bottom - 27
     If (m_sVerify <> "") And (m_sExpandedInfo <> "") Then
-      lEditY = tRC.Bottom - ((24 * m_ScaleY) + 4) 'lButtonY3 + (23 * m_ScaleY) + 22 '58
+        lEditY = tRC.Bottom - ((24 * m_ScaleY) + (5 * m_ScaleY)) 'lButtonY3 + (23 * m_ScaleY) + 22 '58
     Else
-        lEditY = tRC.Bottom - ((24 * m_ScaleY) + 4) 'lButtonY3 + (23 * m_ScaleY) + 17 'lButtonY3 + (40 * m_ScaleY)
+        lEditY = tRC.Bottom - ((24 * m_ScaleY) + (5 * m_ScaleY)) 'lButtonY3 + (23 * m_ScaleY) + 17 'lButtonY3 + (40 * m_ScaleY)
     End If
     If ((uTDC.dwFlags And TDF_EXPAND_FOOTER_AREA) = TDF_EXPAND_FOOTER_AREA) And ((uTDC.dwFlags And TDF_EXPANDED_BY_DEFAULT) = TDF_EXPANDED_BY_DEFAULT) And (m_sExpandedInfo <> "") Then
-        lEditY = tRC.Bottom - ((58 * m_ScaleY) + 4)
+        lEditY = tRC.Bottom - ((58 * m_ScaleY) + (5 * m_ScaleY))
     End If
     If (m_sFooter = "") Or (m_sFooter = "$input") Then
         m_sFooter = " "
@@ -3341,7 +3361,9 @@ Dim i As Long
                      
 
 
-        hFont = GetStockObject(DEFAULT_GUI_FONT)
+        'hFont = GetStockObject(DEFAULT_GUI_FONT)
+        'hFont = SendMessageW(hUI, WM_GETFONT, 0, ByVal 0)
+        hFont = m_hFontDisp
         If hFont Then
             SendMessageW hEditBox, WM_SETFONT, hFont, ByVal 0&
         End If
@@ -3378,8 +3400,7 @@ Call GetObject(hLogoImage, LenB(tBMP), tBMP)
 CX = tBMP.BMWidth
 CY = tBMP.BMHeight
 If nLogoPos = LogoTopRight Then
-    
-    px = tRC.Right - CX = lLogoX
+    px = tRC.Right - CX - lLogoX
     py = lLogoY
 ElseIf nLogoPos = LogoButtons Then
     px = lLogoX
@@ -3602,7 +3623,7 @@ If hEditBox Then
 '        lEditY = tRC.Bottom - 27
 '        cxEdit = 180
         If cxInputBox = -1 Then
-            cxEdit = tRC.Right - ((16 * m_ScaleX) + 32) '48
+            cxEdit = tRC.Right - ((16 * m_ScaleX) * 2) '48
         Else
             cxEdit = 180 * m_ScaleX
         End If
@@ -3610,7 +3631,7 @@ If hEditBox Then
         Select Case nIBFooterAlign
         
             Case tdcaLeft
-                lEditX = (16 * m_ScaleX) + 16 '32
+                lEditX = (16 * m_ScaleX) * 2 '32
             Case tdcaCenter
                 lEditX = ((16 * m_ScaleX) + 16) + (((tRC.Right - ((16 * m_ScaleX) + 16) - 10) - (cxEdit)) \ 2)
             Case tdcaRight
@@ -3618,9 +3639,9 @@ If hEditBox Then
         End Select    'lEditY = tRC.Bottom - 27
          If (m_sVerify <> "") And (m_sExpandedInfo <> "") Then
                   'TODO: ADJUST FOR EXPAND-TO-FOOTER
-          lEditY = tRC.Bottom - ((24 * m_ScaleY) + 4) 'lButtonY3 + (23 * m_ScaleY) + 22 '58
+            lEditY = tRC.Bottom - ((24 * m_ScaleY) + (6 * m_ScaleY)) 'lButtonY3 + (23 * m_ScaleY) + 22 '58
         Else
-            lEditY = tRC.Bottom - ((24 * m_ScaleY) + 4) 'lButtonY3 + (23 * m_ScaleY) + 17 'lButtonY3 + (40 * m_ScaleY)
+            lEditY = tRC.Bottom - ((24 * m_ScaleY) + (6 * m_ScaleY)) 'lButtonY3 + (23 * m_ScaleY) + 17 'lButtonY3 + (40 * m_ScaleY)
         End If
        
     End If
@@ -3628,7 +3649,7 @@ If hEditBox Then
         SetWindowPos hEditBox, 0&, lEditX, lEditY, cxEdit, 22&, SWP_NOSIZE
         RepaintWindow hEditBox
     End If
-    SetWindowPos m_TDhWnd, 0, 0, 0, tRC.Right, tRC.Bottom + (28 * m_ScaleY), SWP_NOMOVE
+    If m_ScaleY = 1 Then SetWindowPos m_TDhWnd, 0, 0, 0, tRC.Right, tRC.Bottom + (28 * m_ScaleY), SWP_NOMOVE
 End If
 End Sub
 Private Sub ComboReposition()
@@ -3697,7 +3718,7 @@ If hCombo Then
         SetWindowPos hCombo, 0&, lEditX, lEditY, cxEdit, 115&, SWP_NOSIZE
         RepaintWindow hCombo
     End If
-    SetWindowPos m_TDhWnd, 0, 0, 0, tRC.Right, tRC.Bottom + (28 * m_ScaleY), SWP_NOMOVE
+    If m_ScaleY = 1 Then SetWindowPos m_TDhWnd, 0, 0, 0, tRC.Right, tRC.Bottom + (28 * m_ScaleY), SWP_NOMOVE
 End If
 End Sub
 
@@ -3812,7 +3833,7 @@ If hDateTime Then
             RepaintWindow hDateTime2
         End If
     End If
-    SetWindowPos m_TDhWnd, 0, 0, 0, tRC.Right, tRC.Bottom + 30 * m_ScaleY, SWP_NOMOVE
+    If m_ScaleY = 1 Then SetWindowPos m_TDhWnd, 0, 0, 0, tRC.Right, tRC.Bottom + (28 * m_ScaleY), SWP_NOMOVE
 End If
 End Sub
 Private Sub SliderReposition()
@@ -3908,7 +3929,7 @@ If hSlider Then
         RepaintWindow hSlider
 
     End If
-    SetWindowPos m_TDhWnd, 0, 0, 0, tRC.Right, tRC.Bottom + (42 * m_ScaleY), SWP_NOMOVE
+    If m_ScaleY = 1 Then SetWindowPos m_TDhWnd, 0, 0, 0, tRC.Right, tRC.Bottom + (28 * m_ScaleY), SWP_NOMOVE
 
 End If
 End Sub
@@ -4304,10 +4325,10 @@ Select Case uNotification
         Exit Function
     Case TDN_BUTTON_CLICKED
         If ButtonIsHeld(CLng(wParam)) Then
-            Debug.Print "BtnClick(Held) " & wParam
+            DebugAppend "BtnClick(Held) " & wParam
             zz_ProcessCallback = S_FALSE
         Else
-            Debug.Print "BtnClick " & wParam
+            DebugAppend "BtnClick " & wParam
             zz_ProcessCallback = S_OK
         End If
         RaiseEvent ButtonClick(CLng(wParam))
@@ -4366,20 +4387,20 @@ Select Case uNotification
                 lLastCY = t2.Bottom
                 bReposTrigger = True
                 If wParam Then
-'                    DebugAppend "Expando wParam 1; nba=" & nBreaksAdded
+                    DebugAppend "Expando wParam 1; nba=" & nBreaksAdded
                     If nBreaksAdded = 1 Then
-'                        DebugAppend "Remove single"
-                        Me.Content = Left$(m_sContent, Len(m_sContent) - 2)
-                    ElseIf nBreaksAdded = 2 Then
-'                        DebugAppend "Remove double"
+                        DebugAppend "Remove single"
                         Me.Content = Left$(m_sContent, Len(m_sContent) - 4)
+                    ElseIf nBreaksAdded = 2 Then
+                        DebugAppend "Remove double"
+                        Me.Content = Left$(m_sContent, Len(m_sContent) - 8)
                     End If
                 Else
-'                    DebugAppend "Expando wParam 0; nba=" & nBreaksAdded
+                    DebugAppend "Expando wParam 0; nba=" & nBreaksAdded
                     If nBreaksAdded = 1 Then
                         Me.Content = m_sContent & vbCrLf
                     ElseIf nBreaksAdded = 2 Then
-'                        DebugAppend "add double"
+                        DebugAppend "add double"
                         If (uTDC.dwFlags And TDF_ENABLE_HYPERLINKS) Then
                             Me.Content = m_sContent & vbCrLf & vbCrLf & " "  '(link control requires a space or it ignores the double-break)
                         Else
@@ -4518,7 +4539,7 @@ Select Case uMsg
         End If
             
     Case BCM_SETDROPDOWNSTATE
-        Debug.Print "BCM_SETDROPDOWNSTATE"
+        DebugAppend "BCM_SETDROPDOWNSTATE"
         If wParam = 1 Then
             RaiseEvent DropdownButtonClicked(lng_hWnd)
         End If
