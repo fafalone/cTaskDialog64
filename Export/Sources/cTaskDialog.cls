@@ -50,6 +50,10 @@ Option Explicit
 '
 '*********************************
 'VERSION HISTORY
+'Version 1.2.3 Universal
+'Bug fix: Resolved incorrect positioning on some systems. This occured when system visual effects
+'         for window min/max were disabled, preventing getting the previous size after being 
+'         notified of the expando click.
 'Version 1.2.2 Universal
 '-The Init routine now sets the default date/time
 '-The Logo B demo now shows querying the DPI to load a larger image for scaling > 100%.
@@ -248,7 +252,7 @@ Option Explicit
 
 '*******************************************************************************
 'USER OPTIONS : Configuration for developers using this class.
-Private Const useropt_dbg_PrintToImmediate As Boolean = False
+Private Const useropt_dbg_PrintToImmediate As Boolean = True
 Private Const useropt_dbg_MinLevel As Long = 0&
 Private Const useropt_dbg_IncludeDateTime As Boolean = True
 '********************************************************************************
@@ -749,6 +753,9 @@ Private Declare PtrSafe Function SetWindowSubclass Lib "comctl32.dll" Alias "#41
 Private Declare PtrSafe Function RemoveWindowSubclass Lib "comctl32.dll" Alias "#412" (ByVal hWnd As LongPtr, ByVal pfnSubclass As LongPtr, ByVal uIdSubclass As LongPtr) As Long
 Private Declare PtrSafe Function SystemParametersInfoW Lib "user32" (ByVal uiAction As Long, ByVal uiParam As Long, pvParam As Any, ByVal fWinIni As Long) As Long
 Private Declare PtrSafe Function CreateFontIndirectW Lib "gdi32" (ByRef lpLogFont As LOGFONTW) As LongPtr
+Private Declare PtrSafe Function RegOpenKeyExW Lib "advapi32" (ByVal hKey As LongPtr, ByVal lpSubKey As LongPtr, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As LongPtr) As Long
+Private Declare PtrSafe Function RegQueryValueExW Lib "advapi32" (ByVal hKey As LongPtr, ByVal lpValueName As LongPtr, lpReserved As Long, ByRef lpType As Long, ByVal szData As LongPtr, ByRef lpcbData As Long) As Long
+Private Declare PtrSafe Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As LongPtr) As Long
 #If Win64 Then
 Private Declare PtrSafe Function GetWindowLong Lib "user32" Alias "GetWindowLongPtrW" (ByVal hWnd As LongPtr, ByVal nIndex As Long) As LongPtr
 Private Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLongPtrW" (ByVal hWnd As LongPtr, ByVal nIndex As Long, ByVal dwNewLong As LongPtr) As LongPtr
@@ -816,6 +823,9 @@ Private Declare Function WideCharToMultiByte Lib "kernel32" (ByVal codepage As L
 Private Declare Function lstrlenW Lib "kernel32" (lpString As Any) As Long
 Private Declare Function SystemParametersInfoW Lib "user32" (ByVal uiAction As Long, ByVal uiParam As Long, pvParam As Any, ByVal fWinIni As Long) As Long
 Private Declare Function CreateFontIndirectW Lib "gdi32" (ByRef lpLogFont As LOGFONTW) As Long
+Private Declare Function RegOpenKeyExW Lib "advapi32" (ByVal hKey As Long, ByVal lpSubKey As Long, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
+Private Declare Function RegQueryValueExW Lib "advapi32" (ByVal hKey As Long, ByVal lpValueName As Long, lpReserved As Long, ByRef lpType As Long, ByVal szData As Long, ByRef lpcbData As Long) As Long
+Private Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
 #End If
 
 Private Const CP_ACP = 0        ' ANSI code page
@@ -830,6 +840,9 @@ Private Enum GWL_nIndex
   GWL_USERDATA = (-21)
 End Enum
 
+Private Const HKEY_CURRENT_USER = &H80000001
+Private Const KEY_QUERY_VALUE = &H1&
+Private Const REG_SZ = 1&
 
 Private Const LOGPIXELSX = 88
 Private Const LOGPIXELSY = 90
@@ -918,6 +931,7 @@ Private bDTCheck As Boolean
 Private bDTCheck2 As Boolean
 Private lLastCY As Long
 Private nTmrCnt As Long
+Private nTmrDelay As Long
 Private himlCombo As LongPtr
 Private nSplitButtonID As Long
 Private m_sTitle As String
@@ -957,7 +971,7 @@ Private m_HasCustomControl As Boolean
 Private m_lNewIcon As LongPtr
 Private nBreaksAdded As Integer
 Private uTDC As TASKDIALOGCONFIG
-
+Private mMinMaxEffectEnabled As Boolean
 Private hShell32 As LongPtr, hImageRes As LongPtr
 Private lgpX As Long, lgpY As Long
 
@@ -2499,6 +2513,24 @@ Private Function tdHiWord(ByVal dwValue As Long) As Integer
   CopyMemory tdHiWord, ByVal VarPtr(dwValue) + 2, 2
 End Function
 
+Private Function TrimNullW(sData As String) As String
+    TrimNullW = Left$(sData, lstrlenW(ByVal StrPtr(sData)))
+End Function
+
+Private Function GetRegistryValueW(lKeyType As Long, sPath As String, sKey As String) As String
+Dim hKey As LongPtr
+Dim R As Long
+Dim sRes As String
+Dim lDataLen As Long
+Dim lType As Long
+R = RegOpenKeyExW(lKeyType, StrPtr(sPath), 0, KEY_QUERY_VALUE, hKey)
+R = RegQueryValueExW(hKey, StrPtr(sKey), 0, lType, 0, lDataLen)
+sRes = String$(lDataLen, 0)
+R = RegQueryValueExW(hKey, StrPtr(sKey), 0, REG_SZ, StrPtr(sRes), lDataLen)
+GetRegistryValueW = TrimNullW(sRes)
+R = RegCloseKey(hKey)
+End Function
+    
 Private Sub Class_Initialize()
 Dim hDC As LongPtr
 Dim dpi As Long
@@ -2507,6 +2539,7 @@ dpi = GetDeviceCaps(hDC, LOGPIXELSY)
 m_ScaleX = GetDeviceCaps(hDC, LOGPIXELSX) / 96
 m_ScaleY = dpi / 96
 ReleaseDC 0&, hDC
+Debug.Print m_ScaleY
 Dim nci As NONCLIENTMETRICSW
 Dim tLF As LOGFONTW
 Dim lRet As Long
@@ -2517,6 +2550,14 @@ If lRet Then
     m_hFontDisp = CreateFontIndirectW(nci.lfMessageFont)
 End If
 If m_hFontDisp = 0 Then m_hFontDisp = GetStockObject(DEFAULT_GUI_FONT) 'fallback
+Dim sMinMaxEffect As String
+sMinMaxEffect = GetRegistryValueW(HKEY_CURRENT_USER, "Control Panel\Desktop\WindowMetrics", "MinAnimate")
+If sMinMaxEffect = "1" Then
+    mMinMaxEffectEnabled = True
+	nTmrDelay = 5
+Else
+    nTmrDelay = 0
+End If
 ReDim m_uButtons(0)
 ReDim m_uRadioButtons(0)
 ReDim btnCaps(0)
@@ -4342,17 +4383,18 @@ Select Case uNotification
             lAutocloseTrack = lAutoclose - DateDiff("s", dtAC1, dtAC2)
         End If
         If bReposTrigger Then
-            If nTmrCnt = 5 Then
+            If nTmrCnt = nTmrDelay Then
                 nTmrCnt = 0
                 Dim t3 As RECT
                 GetClientRect m_TDhWnd, t3
-                If t3.Bottom <> lLastCY Then
+                DebugAppend "lLastCY=" & lLastCY & ",now=" & t3.Bottom
+                'If t3.Bottom <> lLastCY Then
                     bReposTrigger = False
                     InputReposition
                     ComboReposition
                     DateTimeReposition
                     SliderReposition
-                End If
+                'End If
             Else
                 nTmrCnt = nTmrCnt + 1
             End If
@@ -4385,7 +4427,7 @@ Select Case uNotification
                 Dim t2 As RECT
                 GetClientRect m_TDhWnd, t2
                 lLastCY = t2.Bottom
-                bReposTrigger = True
+                DebugAppend "Set lLastCY=" & t2.Bottom
                 If wParam Then
                     DebugAppend "Expando wParam 1; nba=" & nBreaksAdded
                     If nBreaksAdded = 1 Then
@@ -4406,10 +4448,9 @@ Select Case uNotification
                         Else
                             Me.Content = m_sContent & vbCrLf & vbCrLf
                         End If
-
-    
                     End If
                 End If
+                bReposTrigger = True
             End If
         End If
 
