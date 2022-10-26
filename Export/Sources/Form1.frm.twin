@@ -297,11 +297,11 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     With TaskDialog1
         .Init
         .MainInstruction = "Duplicates"
-        .Content = "If you want to exclude an Artists name from the search:" & vbCrLf & vbCrLf
+        .Content = "If you want to exclude an Artists name from the search:" '& vbCrLf & vbCrLf
         .Flags = TDF_INPUT_BOX Or TDF_VERIFICATION_FLAG_CHECKED
         .AddCustomButton 100, "Continue"
         .CommonButtons = TDCBF_CANCEL_BUTTON
-        .IconMain = TD_SHIELD_ICON
+        .IconMain = TD_INFORMATION_ICON
         .Title = "cTaskDialog Project"
         .InputText = "Enter Artist name here."
         .VerifyText = "Exclude Jingles"

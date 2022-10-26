@@ -1935,7 +1935,7 @@ If ((uTDC.dwFlags And TDF_INPUT_BOX) And (nInputAlign = TDIBA_Content)) Or _
 '                m_sContent = m_sContent & vbCrLf & " "
 '                nBreaksAdded = 1
                 'If (uTDC.dwFlags And TDF_SLIDER) Then 'double-break is mandatory for slider
-                    If Right$(m_sContent, 5) <> (vbCrLf & vbCrLf & " ") Then
+                    If Right$(m_sContent, 9) <> (vbCrLf & vbCrLf & " ") Then
                         m_sContent = m_sContent & vbCrLf & vbCrLf
                         If (uTDC.dwFlags And TDF_ENABLE_HYPERLINKS) Then
                         Dim lnkPos As Long
@@ -2677,7 +2677,7 @@ If ((.dwFlags And TDF_INPUT_BOX) And (cTD.InputAlign = TDIBA_Content)) Or _
 '                m_sContent = m_sContent & vbCrLf & " "
 '                nBreaksAdded = 1
                 'If (uTDC.dwFlags And TDF_SLIDER) Then 'double-break is mandatory for slider
-                    If Right$(sz(1), 5) <> (vbCrLf & vbCrLf & " ") Then
+                    If Right$(sz(1), 9) <> (vbCrLf & vbCrLf & " ") Then
                         sz(1) = sz(1) & vbCrLf & vbCrLf
                         If (.dwFlags And TDF_ENABLE_HYPERLINKS) Then
                             sz(1) = sz(1) & " "  '(link control requires a space or it ignores the double-break)
@@ -4432,10 +4432,15 @@ Select Case uNotification
                     DebugAppend "Expando wParam 1; nba=" & nBreaksAdded
                     If nBreaksAdded = 1 Then
                         DebugAppend "Remove single"
-                        Me.Content = Left$(m_sContent, Len(m_sContent) - 4)
+                        Me.Content = Left$(m_sContent, Len(m_sContent) - 2)
                     ElseIf nBreaksAdded = 2 Then
                         DebugAppend "Remove double"
-                        Me.Content = Left$(m_sContent, Len(m_sContent) - 8)
+                        If (uTDC.dwFlags And TDF_ENABLE_HYPERLINKS) Then
+                            Me.Content = Left$(m_sContent, Len(m_sContent) - 5)
+                        Else
+                            Me.Content = Left$(m_sContent, Len(m_sContent) - 4)
+                        End If
+                        
                     End If
                 Else
                     DebugAppend "Expando wParam 0; nba=" & nBreaksAdded
