@@ -13,14 +13,14 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-'*********************************
-'cTaskDialog v1.2 R2 X64 Version
+'*************************************************
+'cTaskDialog v1.2.3 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
 'Originally Released 21 March 2020
 'x64 Version released 21 October 2022
-'*********************************
+'*************************************************
 '
 '
 'Provides a full implementation of TaskDialogIndirect and extensive enhancements.
@@ -37,7 +37,7 @@ Option Explicit
 'The thread contains detailed samples complete with images for all features.
 'Submit any bug reports in that thread as well.
 '
-'*********************************
+'*************************************************
 'REQUIREMENTS
 '--Common Controls 6.0 are required. Your application, and the VB IDE if running from there,
 '  must include a manifest specifying 6.0. The cTaskDialog sample project includes one in its
@@ -48,12 +48,14 @@ Option Explicit
 '
 '--The TaskDialogIndirect API is only available on Windows Vista and newer.
 '
-'*********************************
+'*************************************************
 'VERSION HISTORY
+'
 'Version 1.2.3 Universal
 'Bug fix: Resolved incorrect positioning on some systems. This occured when system visual effects
 '         for window min/max were disabled, preventing getting the previous size after being 
 '         notified of the expando click.
+'
 'Version 1.2.2 Universal
 '-The Init routine now sets the default date/time
 '-The Logo B demo now shows querying the DPI to load a larger image for scaling > 100%.
@@ -2963,6 +2965,7 @@ Private Sub AddSlider()
 Dim lEditX As Long, lEditY As Long, cxEdit As Long
 Dim tRC As RECT
 Dim lOffX As Long
+
 m_HasCustomControl = True
 GetClientRect m_TDhWnd, tRC
 If nSliderAlign = TDIBA_Footer Then

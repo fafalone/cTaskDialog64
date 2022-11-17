@@ -1,6 +1,6 @@
 Attribute VB_Name = "mTDHelper"
 Option Explicit
-
+#Const CTASKDIALOG_DEFINED = 1
 #If (VBA7 = 0) Then
 Public Enum LongPtr
     [_]
