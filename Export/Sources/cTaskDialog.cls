@@ -13,14 +13,14 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-'*************************************************
-'cTaskDialog v1.2.3 Universal Compatibility Version
+'************************************************************
+'cTaskDialog v1.2.4 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
 'Originally Released 21 March 2020
-'x64 Version released 21 October 2022
-'*************************************************
+'x64 Version released 21 October 2022; update 23 Nov 2022
+'************************************************************
 '
 '
 'Provides a full implementation of TaskDialogIndirect and extensive enhancements.
@@ -35,7 +35,8 @@ Option Explicit
 'For full details on usage and support, see the development thread at VBForums:
 'http://www.vbforums.com/showthread.php?777021
 'The thread contains detailed samples complete with images for all features.
-'Submit any bug reports in that thread as well.
+'Submit any bug reports in that thread as well, or on this project's GitHub:
+'https://github.com/fafalone/cTaskDialog64
 '
 '*************************************************
 'REQUIREMENTS
@@ -50,6 +51,9 @@ Option Explicit
 '
 '*************************************************
 'VERSION HISTORY
+'
+'Version 1.2.4 Universal
+'Bug fix: VBA calls in ShowDialog/NavigatePage incorrectly pointed to array instead of 1st item.
 '
 'Version 1.2.3 Universal
 'Bug fix: Resolved incorrect positioning on some systems. This occured when system visual effects
@@ -2049,7 +2053,7 @@ nComboIdx = -1
         next i
     End If
     Dim ptrBtn As LongPtr, ptrRbn As LongPtr
-    ptrBtn = VarPtr(m_uButtons_VBA7): ptrRbn = VarPtr(m_uRadioButtons_VBA7)
+    ptrBtn = VarPtr(m_uButtons_VBA7(0)): ptrRbn = VarPtr(m_uRadioButtons_VBA7(0))
     CopyMemory uTDC_VBA7.data(0), uTDC.cbSize, 4: CopyMemory uTDC_VBA7.data(4), uTDC.hWndParent, 8: CopyMemory uTDC_VBA7.data(12), uTDC.hInstance, 8
     CopyMemory uTDC_VBA7.data(16), uTDC.dwFlags, 4: CopyMemory uTDC_VBA7.data(20), uTDC.dwCommonButtons, 4: CopyMemory uTDC_VBA7.data(24), uTDC.pszWindowTitle, 8
     CopyMemory uTDC_VBA7.data(32), uTDC.pszMainIcon, 8: CopyMemory uTDC_VBA7.data(40), uTDC.pszMainInstruction, 8: CopyMemory uTDC_VBA7.data(48), uTDC.pszContent, 8
@@ -2772,7 +2776,7 @@ End If
         next i
     End If
     Dim ptrBtn As LongPtr, ptrRbn As LongPtr
-    ptrBtn = VarPtr(uBTN_VBA7): ptrRbn = VarPtr(uRBN_VBA7)
+    ptrBtn = VarPtr(uBTN_VBA7(0)): ptrRbn = VarPtr(uRBN_VBA7(0))
     CopyMemory uTDC2_VBA7.data(0), uTDC2.cbSize, 4: CopyMemory uTDC2_VBA7.data(4), uTDC2.hWndParent, 8: CopyMemory uTDC2_VBA7.data(12), uTDC2.hInstance, 8
     CopyMemory uTDC2_VBA7.data(16), uTDC2.dwFlags, 4: CopyMemory uTDC2_VBA7.data(20), uTDC2.dwCommonButtons, 4: CopyMemory uTDC2_VBA7.data(24), uTDC2.pszWindowTitle, 8
     CopyMemory uTDC2_VBA7.data(32), uTDC2.pszMainIcon, 8: CopyMemory uTDC2_VBA7.data(40), uTDC2.pszMainInstruction, 8: CopyMemory uTDC2_VBA7.data(48), uTDC2.pszContent, 8
