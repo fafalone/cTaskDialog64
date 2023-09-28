@@ -316,6 +316,8 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         End If
     End With
     
+
+    
     End Sub
     
     Private Sub Command2_Click()
@@ -325,7 +327,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     '    .Flags = TDF_CAN_BE_MINIMIZED 'TDF_KILL_SHIELD_ICON
     '    .Flags = TDF_ALLOW_DIALOG_CANCELLATION
         .Content = "This is a simple dialog."
-        .CommonButtons = TDCBF_YES_BUTTON Or TDCBF_CLOSE_BUTTON 'Or TDCBF_CANCEL_BUTTON
+        .CommonButtons = TDCBF_YES_BUTTON Or TDCBF_CLOSE_BUTTON Or TDF_ALLOW_DIALOG_CANCELLATION 'Or TDCBF_CANCEL_BUTTON
         .IconMain = IDI_ERROR
         .Title = "cTaskDialog Project"
         .ParenthWnd = Me.hWnd

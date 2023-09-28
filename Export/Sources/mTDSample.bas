@@ -3,7 +3,7 @@ Option Explicit
 'mTDSample.bas
 'Module for cTaskDialog Demo
 'This module is only required for some actions performed by the demos
-'It is not required to use cTaskDialog.cls, which now requires no external modules.
+'It is not required to use cTaskDialog.cls.
 
 
 
@@ -62,7 +62,7 @@ Public Enum SHGFI_flags
                                                         ' containing the icon, rtns BOOL
   SHGFI_EXETYPE = &H2000            ' rtns two ASCII chars of exe type
   SHGFI_SYSICONINDEX = &H4000   ' sfi.iIcon is sys il icon index, rtns hImagelist
-  SHGFI_LINKOVERLAY = &H8000    ' add shortcut overlay to sfi.hIcon
+  SHGFI_LINKOVERLAY = &H8000&    ' add shortcut overlay to sfi.hIcon
   SHGFI_SELECTED = &H10000        ' sfi.hIcon is selected icon
   SHGFI_ATTR_SPECIFIED = &H20000    ' get only attributes specified in sfi.dwAttributes
 End Enum
