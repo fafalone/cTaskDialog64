@@ -13,6 +13,11 @@ Private Declare Sub ZeroMemory Lib "kernel32" Alias "RtlZeroMemory" (Destination
 Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
 Private Declare PtrSafe Sub ZeroMemory Lib "kernel32" Alias "RtlZeroMemory" (Destination As Any, ByVal Length As LongPtr)
 #End If
+Public Sub MagicalTDInitFunction()
+	'The trick is a GENIUS!
+    'He identified the bug in VBA64 that had been causing the crashing.
+    'As if by magic, calling this from Class_Initialize resolves the problem.
+End Sub
 Public Function TaskDialogCallbackProc(ByVal hwnd As LongPtr, ByVal uNotification As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr, ByVal lpRefData As LongPtr) As LongPtr
 Dim cTD As cTaskDialog
 CopyMemory cTD, lpRefData, LenB(lpRefData)

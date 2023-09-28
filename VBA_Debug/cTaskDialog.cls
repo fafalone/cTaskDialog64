@@ -14,12 +14,12 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.2.5 Universal Compatibility Version
+'cTaskDialog v1.3.7 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
 'Originally Released 21 March 2020
-'x64 Version released 21 October 2022; update 27 Nov 2022
+'x64 Version released 21 October 2022; update 28 Sep 2023
 '************************************************************
 '
 '
@@ -51,6 +51,17 @@ Option Explicit
 '
 '*************************************************
 'VERSION HISTORY
+'
+'Version 1.3.7 **REALLY UNIVERSAL**!!
+'Thanks to brilliant VBForums user The trick, the crashing in VBA64 has been eliminated
+'after a bug in VBA was discovered and a workaround found. 
+'ADVANCED PROGRAMMERS TAKE NOTE: This likely has broader applicability. If you're experiencing
+'   crashing in ordinary module-based callbacks or subclassing, apply the same fix as here: 
+'   Call an unused dummy sub in the module from Class_Initialize before doing anything else.
+'
+'Version 1.2.6 Universal 
+'Bug fix: SimpleDialog return TDBUTTONS insted of TDRESULT
+'
 '
 'Version 1.2.5 Universal
 'Bug fix: Numerous bug fixes to VBA calls and unsupported App. items while in VBA. The code to
@@ -668,9 +679,9 @@ Private Type TASKDIALOG_BUTTON
     nButtonID As Long
     pszButtonText As LongPtr
 End Type
-' #If TWINBASIC Then
-' [ PackingAlignment (1) ]
-' #End If
+#If TWINBASIC Then
+[ PackingAlignment (1) ]
+#End If
 Private Type TASKDIALOGCONFIG
     cbSize As Long
     hWndParent As LongPtr
@@ -700,7 +711,7 @@ End Type
 
 #If VBA7 Then
 	
-    '#If (Win64 <> 0) And (TWINBASIC = 0) Then
+    #If (Win64 <> 0) And (TWINBASIC = 0) Then
     	
         'VBA7 does not support the packing alignment attribute that makes calling this easy in twinBASIC; x64 inserts padding this particular API doesn't expect.
         Private Type TASKDIALOG_BUTTON_VBA7
@@ -716,7 +727,7 @@ End Type
                                                                         pnButton As Long, _
                                                                         pnRadioButton As Long, _
                                                                         pfVerificationFlagChecked As Long) As Long
-    '#End If
+    #End If
 Private Declare PtrSafe Function TaskDialog Lib "comctl32.dll" _
                                                     (ByVal hWndParent As LongPtr, _
                                                      ByVal hInstance As LongPtr, _
@@ -1151,6 +1162,232 @@ Private Type NONCLIENTMETRICSW
    iPaddedBorderWidth As Long
 End Type
 Private Const SPI_GETNONCLIENTMETRICS = &H29
+
+Private pfnCallback As LongPtr
+Private Const CBPROC_IDX = 0
+
+'@0
+Public Function zz_ProcessCallback(ByVal hWnd As LongPtr, ByVal uNotification As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr) As LongPtr
+'***DO NOT CALL THIS FUNCTION***
+Dim bSC As Boolean
+
+Select Case uNotification
+    Case TDN_DIALOG_CONSTRUCTED
+        If (uTDC.dwFlags And TDF_KILL_SHIELD_ICON) Then
+            SendMessageW hWnd, TDM_UPDATE_ICON, TDIE_ICON_MAIN, ByVal m_lNewIcon
+        End If
+        RaiseEvent DialogConstucted(hWnd)
+    Case TDN_CREATED
+        m_TDhWnd = hWnd
+        dtAC1 = Now
+        ReDim m_hButton(0)
+        lButtonX = 0
+        lButtonY = 0
+        lButtonX2 = 0
+        lButtonY2 = 0
+        lButtonX3 = 0
+        lButtonY3 = 0
+        lButtonX4 = 0
+        lButtonY4 = 0
+        ReDim arBtnX(0)
+        'If m_cbEnum = 0& Then m_cbEnum = AddressOf ProcessEnumCallback ' scb_SetCallbackAddr(2, 3)
+        'Call EnumChildWindows(hWnd, m_cbEnum, ObjPtr(Me))
+        Call EnumChildWindows(hWnd, AddressOf TaskDialogEnumChildProc, ObjPtr(Me))
+        SetButtonIcons
+        SetInitialButtonStates
+        If (m_sExpandedInfo <> "") Then bPosUsed(1) = True 'expando control taking up the button position, so we can't add ours
+        If (m_sVerify <> "") Then bPosUsed(1) = True 'same for verify
+        If (uTDC.dwFlags And TDF_INPUT_BOX) Then AddInputBox: bSC = True
+        If (uTDC.dwFlags And TDF_COMBO_BOX) Then AddComboBox nCbType
+        If (uTDC.dwFlags And TDF_DATETIME) Then AddDateTime: bSC = True
+        If (uTDC.dwFlags And TDF_SLIDER) Then AddSlider: bSC = True
+        If (hLogoImage) Then AddLogo: bSC = True
+        If m_HasCustomControl = True Then FocusMainControl
+        If bSC Then 'combo box subclasses different hWnds in the Add func
+            Subclass2 hUI, AddressOf TaskDialogSubclassProc, m_TDhWnd, ObjPtr(Me)
+        End If
+        RaiseEvent DialogCreated(hWnd)
+    Case TDN_HYPERLINK_CLICKED
+        If uTDC.dwFlags And TDF_EXEC_HYPERLINKS Then
+            Call ShellExecuteW(0, 0, lParam, 0, 0, 1)
+        End If
+        zz_ProcessCallback = S_OK
+        RaiseEvent HyperlinkClick(lParam)
+        Exit Function
+    Case TDN_BUTTON_CLICKED
+        If ButtonIsHeld(CLng(wParam)) Then
+            DebugAppend "BtnClick(Held) " & wParam
+            zz_ProcessCallback = S_FALSE
+        Else
+            DebugAppend "BtnClick " & wParam
+            zz_ProcessCallback = S_OK
+        End If
+        RaiseEvent ButtonClick(CLng(wParam))
+        Exit Function
+    Case TDN_TIMER
+        dtAC2 = Now
+        If (lAutoclose > 0) And (DateDiff("s", dtAC1, dtAC2) > lAutoclose) Then
+            RaiseEvent AutoClose
+            CloseDialog
+        Else
+            lAutocloseTrack = lAutoclose - DateDiff("s", dtAC1, dtAC2)
+        End If
+        If bReposTrigger Then
+            If nTmrCnt = nTmrDelay Then
+                nTmrCnt = 0
+                Dim t3 As RECT
+                GetClientRect m_TDhWnd, t3
+                DebugAppend "lLastCY=" & lLastCY & ",now=" & t3.Bottom
+                'If t3.Bottom <> lLastCY Then
+                    bReposTrigger = False
+                    InputReposition
+                    ComboReposition
+                    DateTimeReposition
+                    SliderReposition
+                'End If
+            Else
+                nTmrCnt = nTmrCnt + 1
+            End If
+        End If
+        
+        If bPublicTimer Then
+            RaiseEvent Timer(CLng(wParam))
+            If bResetTimer Then
+                bResetTimer = False
+                zz_ProcessCallback = S_FALSE
+            Else
+                zz_ProcessCallback = S_OK
+            End If
+            Exit Function
+        End If
+    Case TDN_RADIO_BUTTON_CLICKED
+        m_ResRad = CLng(wParam) 'for when we need result before dialog is closed
+        RaiseEvent RadioButtonClick(CLng(wParam))
+        Exit Function
+    Case TDN_VERIFICATION_CLICKED
+        m_ResVerify = CLng(wParam)
+        RaiseEvent VerificationClicked(CLng(wParam))
+        Exit Function
+    Case TDN_HELP
+        RaiseEvent Help
+        Exit Function
+    Case TDN_EXPANDO_BUTTON_CLICKED
+        If (uTDC.dwFlags And TDF_INPUT_BOX) Or (uTDC.dwFlags And TDF_COMBO_BOX) Or (uTDC.dwFlags And TDF_DATETIME) Or (uTDC.dwFlags And TDF_SLIDER) Then
+            If (uTDC.dwFlags And TDF_EXPAND_FOOTER_AREA) <> TDF_EXPAND_FOOTER_AREA Then
+                Dim t2 As RECT
+                GetClientRect m_TDhWnd, t2
+                lLastCY = t2.Bottom
+                DebugAppend "Set lLastCY=" & t2.Bottom
+                If wParam Then
+                    DebugAppend "Expando wParam 1; nba=" & nBreaksAdded
+                    If nBreaksAdded = 1 Then
+                        DebugAppend "Remove single"
+                        Me.Content = Left$(m_sContent, Len(m_sContent) - 2)
+                    ElseIf nBreaksAdded = 2 Then
+                        DebugAppend "Remove double"
+                        If (uTDC.dwFlags And TDF_ENABLE_HYPERLINKS) Then
+                            Me.Content = Left$(m_sContent, Len(m_sContent) - 5)
+                        Else
+                            Me.Content = Left$(m_sContent, Len(m_sContent) - 4)
+                        End If
+                        
+                    End If
+                Else
+                    DebugAppend "Expando wParam 0; nba=" & nBreaksAdded
+                    If nBreaksAdded = 1 Then
+                        Me.Content = m_sContent & vbCrLf
+                    ElseIf nBreaksAdded = 2 Then
+                        DebugAppend "add double"
+                        If (uTDC.dwFlags And TDF_ENABLE_HYPERLINKS) Then
+                            Me.Content = m_sContent & vbCrLf & vbCrLf & " "  '(link control requires a space or it ignores the double-break)
+                        Else
+                            Me.Content = m_sContent & vbCrLf & vbCrLf
+                        End If
+                    End If
+                End If
+                bReposTrigger = True
+            End If
+        End If
+
+        RaiseEvent ExpandButtonClicked(CLng(wParam))
+        Exit Function
+    Case TDN_NAVIGATED
+        m_TDhWnd = hWnd 'new dialog treated as page means no TDN_CREATED
+        ReDim m_hButton(0)
+        dtAC1 = Now
+        lButtonX = 0
+        lButtonY = 0
+        lButtonX2 = 0
+        lButtonY2 = 0
+        lButtonX3 = 0
+        lButtonY3 = 0
+        lButtonX4 = 0
+        lButtonY4 = 0
+        ReDim arBtnX(0)
+        'If m_cbEnum = 0& Then m_cbEnum = AddressOf ProcessEnumCallback ' scb_SetCallbackAddr(2, 3)
+        'Call EnumChildWindows(hWnd, m_cbEnum, ObjPtr(Me))
+        Call EnumChildWindows(hWnd, AddressOf TaskDialogEnumChildProc, ObjPtr(Me))
+        SetButtonIcons
+        SetInitialButtonStates
+        If (m_sExpandedInfo <> "") Then bPosUsed(1) = True 'expando control taking up the button position, so we can't add ours
+        If (m_sVerify <> "") Then bPosUsed(1) = True 'same for verify
+        If (uTDC.dwFlags And TDF_INPUT_BOX) Then AddInputBox: bSC = True
+        If (uTDC.dwFlags And TDF_COMBO_BOX) Then AddComboBox nCbType
+        If (uTDC.dwFlags And TDF_DATETIME) Then AddDateTime: bSC = True
+        If (uTDC.dwFlags And TDF_SLIDER) Then AddSlider: bSC = True
+        If (hLogoImage) Then AddLogo
+        If m_HasCustomControl = True Then FocusMainControl
+        If bSC Then 'combo box subclasses different hWnds in the Add func
+            Subclass2 hUI, AddressOf TaskDialogSubclassProc, m_TDhWnd, ObjPtr(Me)
+        End If
+        RaiseEvent Navigated
+        Exit Function
+    Case TDN_DESTROYED
+        If hEditBox Then
+            Dim lLen As Long, sText As String
+            lLen = CLng(SendMessageW(hEditBox, WM_GETTEXTLENGTH, 0, ByVal 0&) * 2)
+            If lLen Then
+                sText = Space$(lLen)
+                Call SendMessageW(hEditBox, WM_GETTEXT, lLen, ByVal sText)
+                sEditText = StrConv(sText, vbFromUnicode)
+            End If
+        End If
+        If hCombo Then
+            nComboIdx = CLng(SendMessageW(hCombo, CB_GETCURSEL, 0, ByVal 0&))
+            If nCbType = cbtDropdownList Then
+                If nComboIdx >= 0 Then
+                    sComboText = aComboItems(nComboIdx).sText
+                Else
+                	sComboText = ""
+                End If
+            Else
+            	sComboText = GetComboTextW(hEditCombo)
+            End If
+        End If
+        Dim rs As Long
+        If hDateTime Then
+            rs = CLng(SendMessageW(hDateTime, DTM_GETSYSTEMTIME, 0&, tDTCur))
+            If rs = GDT_VALID Then
+                bDTCheck = True
+            Else
+                bDTCheck = False
+            End If
+        End If
+        If hDateTime2 Then
+            rs = CLng(SendMessageW(hDateTime2, DTM_GETSYSTEMTIME, 0&, tDTCur2))
+            If rs = GDT_VALID Then
+                bDTCheck2 = True
+            Else
+                bDTCheck2 = False
+            End If
+        End If
+        If hSlider Then
+            lSliderValue = CLng(SendMessageW(hSlider, TBM_GETPOS, 0, ByVal 0&))
+        End If
+        RaiseEvent DialogDestroyed
+        m_TDhWnd = 0
+End Select
+End Function
 
 Private Function GetStrFromPtrW(lpszW As LongPtr) As String
   Dim sRtn As String
@@ -1887,7 +2124,7 @@ End If
 Call SendMessageW(hCombo, CBEM_SETITEMW, 0, cbxi)
 
 End Sub
-Public Function SimpleDialog(sMessage As String, Optional dwBtn As TDBUTTONS = TDCBF_OK_BUTTON, Optional sTitle As String, Optional sMainText As String, Optional dwIco As TDICONS, Optional hWndOwner As LongPtr, Optional hinst As LongPtr) As TDBUTTONS
+Public Function SimpleDialog(sMessage As String, Optional dwBtn As TDBUTTONS = TDCBF_OK_BUTTON, Optional sTitle As String, Optional sMainText As String, Optional dwIco As TDICONS, Optional hWndOwner As LongPtr, Optional hinst As LongPtr) As TDRESULT
    Dim dwIcon As Long
    Dim pnButton As Long
    Dim Success As Long
@@ -2050,8 +2287,7 @@ uTDC.lpCallbackData = ObjPtr(Me)
 sComboText = ""
 nComboIdx = -1
 
-'#If (VBA7 <> 0) And (TWINBASIC = 0) And (Win64 <> 0) Then
-#If True Then
+#If (VBA7 <> 0) And (TWINBASIC = 0) And (Win64 <> 0) Then
 'Special handling for 64bit VBA7, which doesn't support our manually aligned structure.
     Dim cb As Long
     cb = LenB(uTDC_VBA7)
@@ -2538,6 +2774,9 @@ R = RegCloseKey(hKey)
 End Function
     
 Private Sub Class_Initialize()
+#If (Win64 <> 0) And (TWINBASIC = 0) Then
+MagicalTDInitFunction 'VBA64 bug hack
+#End If
 Dim hDC As LongPtr
 Dim dpi As Long
 hDC = GetDC(0&)
@@ -4307,227 +4546,7 @@ End Function
 
 
 '@2
-Public Function zz_ProcessCallback(ByVal hWnd As LongPtr, ByVal uNotification As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr) As LongPtr
-'***DO NOT CALL THIS FUNCTION***
-Dim bSC As Boolean
 
-Select Case uNotification
-    Case TDN_DIALOG_CONSTRUCTED
-        If (uTDC.dwFlags And TDF_KILL_SHIELD_ICON) Then
-            SendMessageW hWnd, TDM_UPDATE_ICON, TDIE_ICON_MAIN, ByVal m_lNewIcon
-        End If
-        RaiseEvent DialogConstucted(hWnd)
-    Case TDN_CREATED
-        m_TDhWnd = hWnd
-        dtAC1 = Now
-        ReDim m_hButton(0)
-        lButtonX = 0
-        lButtonY = 0
-        lButtonX2 = 0
-        lButtonY2 = 0
-        lButtonX3 = 0
-        lButtonY3 = 0
-        lButtonX4 = 0
-        lButtonY4 = 0
-        ReDim arBtnX(0)
-        'If m_cbEnum = 0& Then m_cbEnum = AddressOf ProcessEnumCallback ' scb_SetCallbackAddr(2, 3)
-        'Call EnumChildWindows(hWnd, m_cbEnum, ObjPtr(Me))
-        Call EnumChildWindows(hWnd, AddressOf TaskDialogEnumChildProc, ObjPtr(Me))
-        SetButtonIcons
-        SetInitialButtonStates
-        If (m_sExpandedInfo <> "") Then bPosUsed(1) = True 'expando control taking up the button position, so we can't add ours
-        If (m_sVerify <> "") Then bPosUsed(1) = True 'same for verify
-        If (uTDC.dwFlags And TDF_INPUT_BOX) Then AddInputBox: bSC = True
-        If (uTDC.dwFlags And TDF_COMBO_BOX) Then AddComboBox nCbType
-        If (uTDC.dwFlags And TDF_DATETIME) Then AddDateTime: bSC = True
-        If (uTDC.dwFlags And TDF_SLIDER) Then AddSlider: bSC = True
-        If (hLogoImage) Then AddLogo: bSC = True
-        If m_HasCustomControl = True Then FocusMainControl
-        If bSC Then 'combo box subclasses different hWnds in the Add func
-            Subclass2 hUI, AddressOf TaskDialogSubclassProc, m_TDhWnd, ObjPtr(Me)
-        End If
-        RaiseEvent DialogCreated(hWnd)
-    Case TDN_HYPERLINK_CLICKED
-        If uTDC.dwFlags And TDF_EXEC_HYPERLINKS Then
-            Call ShellExecuteW(0, 0, lParam, 0, 0, 1)
-        End If
-        zz_ProcessCallback = S_OK
-        RaiseEvent HyperlinkClick(lParam)
-        Exit Function
-    Case TDN_BUTTON_CLICKED
-        If ButtonIsHeld(CLng(wParam)) Then
-            DebugAppend "BtnClick(Held) " & wParam
-            zz_ProcessCallback = S_FALSE
-        Else
-            DebugAppend "BtnClick " & wParam
-            zz_ProcessCallback = S_OK
-        End If
-        RaiseEvent ButtonClick(CLng(wParam))
-        Exit Function
-    Case TDN_TIMER
-        dtAC2 = Now
-        If (lAutoclose > 0) And (DateDiff("s", dtAC1, dtAC2) > lAutoclose) Then
-            RaiseEvent AutoClose
-            CloseDialog
-        Else
-            lAutocloseTrack = lAutoclose - DateDiff("s", dtAC1, dtAC2)
-        End If
-        If bReposTrigger Then
-            If nTmrCnt = nTmrDelay Then
-                nTmrCnt = 0
-                Dim t3 As RECT
-                GetClientRect m_TDhWnd, t3
-                DebugAppend "lLastCY=" & lLastCY & ",now=" & t3.Bottom
-                'If t3.Bottom <> lLastCY Then
-                    bReposTrigger = False
-                    InputReposition
-                    ComboReposition
-                    DateTimeReposition
-                    SliderReposition
-                'End If
-            Else
-                nTmrCnt = nTmrCnt + 1
-            End If
-        End If
-        
-        If bPublicTimer Then
-            RaiseEvent Timer(CLng(wParam))
-            If bResetTimer Then
-                bResetTimer = False
-                zz_ProcessCallback = S_FALSE
-            Else
-                zz_ProcessCallback = S_OK
-            End If
-            Exit Function
-        End If
-    Case TDN_RADIO_BUTTON_CLICKED
-        m_ResRad = CLng(wParam) 'for when we need result before dialog is closed
-        RaiseEvent RadioButtonClick(CLng(wParam))
-        Exit Function
-    Case TDN_VERIFICATION_CLICKED
-        m_ResVerify = CLng(wParam)
-        RaiseEvent VerificationClicked(CLng(wParam))
-        Exit Function
-    Case TDN_HELP
-        RaiseEvent Help
-        Exit Function
-    Case TDN_EXPANDO_BUTTON_CLICKED
-        If (uTDC.dwFlags And TDF_INPUT_BOX) Or (uTDC.dwFlags And TDF_COMBO_BOX) Or (uTDC.dwFlags And TDF_DATETIME) Or (uTDC.dwFlags And TDF_SLIDER) Then
-            If (uTDC.dwFlags And TDF_EXPAND_FOOTER_AREA) <> TDF_EXPAND_FOOTER_AREA Then
-                Dim t2 As RECT
-                GetClientRect m_TDhWnd, t2
-                lLastCY = t2.Bottom
-                DebugAppend "Set lLastCY=" & t2.Bottom
-                If wParam Then
-                    DebugAppend "Expando wParam 1; nba=" & nBreaksAdded
-                    If nBreaksAdded = 1 Then
-                        DebugAppend "Remove single"
-                        Me.Content = Left$(m_sContent, Len(m_sContent) - 2)
-                    ElseIf nBreaksAdded = 2 Then
-                        DebugAppend "Remove double"
-                        If (uTDC.dwFlags And TDF_ENABLE_HYPERLINKS) Then
-                            Me.Content = Left$(m_sContent, Len(m_sContent) - 5)
-                        Else
-                            Me.Content = Left$(m_sContent, Len(m_sContent) - 4)
-                        End If
-                        
-                    End If
-                Else
-                    DebugAppend "Expando wParam 0; nba=" & nBreaksAdded
-                    If nBreaksAdded = 1 Then
-                        Me.Content = m_sContent & vbCrLf
-                    ElseIf nBreaksAdded = 2 Then
-                        DebugAppend "add double"
-                        If (uTDC.dwFlags And TDF_ENABLE_HYPERLINKS) Then
-                            Me.Content = m_sContent & vbCrLf & vbCrLf & " "  '(link control requires a space or it ignores the double-break)
-                        Else
-                            Me.Content = m_sContent & vbCrLf & vbCrLf
-                        End If
-                    End If
-                End If
-                bReposTrigger = True
-            End If
-        End If
-
-        RaiseEvent ExpandButtonClicked(CLng(wParam))
-        Exit Function
-    Case TDN_NAVIGATED
-        m_TDhWnd = hWnd 'new dialog treated as page means no TDN_CREATED
-        ReDim m_hButton(0)
-        dtAC1 = Now
-        lButtonX = 0
-        lButtonY = 0
-        lButtonX2 = 0
-        lButtonY2 = 0
-        lButtonX3 = 0
-        lButtonY3 = 0
-        lButtonX4 = 0
-        lButtonY4 = 0
-        ReDim arBtnX(0)
-        'If m_cbEnum = 0& Then m_cbEnum = AddressOf ProcessEnumCallback ' scb_SetCallbackAddr(2, 3)
-        'Call EnumChildWindows(hWnd, m_cbEnum, ObjPtr(Me))
-        Call EnumChildWindows(hWnd, AddressOf TaskDialogEnumChildProc, ObjPtr(Me))
-        SetButtonIcons
-        SetInitialButtonStates
-        If (m_sExpandedInfo <> "") Then bPosUsed(1) = True 'expando control taking up the button position, so we can't add ours
-        If (m_sVerify <> "") Then bPosUsed(1) = True 'same for verify
-        If (uTDC.dwFlags And TDF_INPUT_BOX) Then AddInputBox: bSC = True
-        If (uTDC.dwFlags And TDF_COMBO_BOX) Then AddComboBox nCbType
-        If (uTDC.dwFlags And TDF_DATETIME) Then AddDateTime: bSC = True
-        If (uTDC.dwFlags And TDF_SLIDER) Then AddSlider: bSC = True
-        If (hLogoImage) Then AddLogo
-        If m_HasCustomControl = True Then FocusMainControl
-        If bSC Then 'combo box subclasses different hWnds in the Add func
-            Subclass2 hUI, AddressOf TaskDialogSubclassProc, m_TDhWnd, ObjPtr(Me)
-        End If
-        RaiseEvent Navigated
-        Exit Function
-    Case TDN_DESTROYED
-        If hEditBox Then
-            Dim lLen As Long, sText As String
-            lLen = CLng(SendMessageW(hEditBox, WM_GETTEXTLENGTH, 0, ByVal 0&) * 2)
-            If lLen Then
-                sText = Space$(lLen)
-                Call SendMessageW(hEditBox, WM_GETTEXT, lLen, ByVal sText)
-                sEditText = StrConv(sText, vbFromUnicode)
-            End If
-        End If
-        If hCombo Then
-            nComboIdx = CLng(SendMessageW(hCombo, CB_GETCURSEL, 0, ByVal 0&))
-            If nCbType = cbtDropdownList Then
-                If nComboIdx >= 0 Then
-                    sComboText = aComboItems(nComboIdx).sText
-                Else
-                	sComboText = ""
-                End If
-            Else
-            	sComboText = GetComboTextW(hEditCombo)
-            End If
-        End If
-        Dim rs As Long
-        If hDateTime Then
-            rs = CLng(SendMessageW(hDateTime, DTM_GETSYSTEMTIME, 0&, tDTCur))
-            If rs = GDT_VALID Then
-                bDTCheck = True
-            Else
-                bDTCheck = False
-            End If
-        End If
-        If hDateTime2 Then
-            rs = CLng(SendMessageW(hDateTime2, DTM_GETSYSTEMTIME, 0&, tDTCur2))
-            If rs = GDT_VALID Then
-                bDTCheck2 = True
-            Else
-                bDTCheck2 = False
-            End If
-        End If
-        If hSlider Then
-            lSliderValue = CLng(SendMessageW(hSlider, TBM_GETPOS, 0, ByVal 0&))
-        End If
-        RaiseEvent DialogDestroyed
-        m_TDhWnd = 0
-End Select
-End Function
 
 '@1
 Public Function zz_ProcessSubclass(ByVal lng_hWnd As LongPtr, ByVal uMsg As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr, ByVal uIdSubclass As LongPtr) As LongPtr
