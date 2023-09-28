@@ -1,6 +1,6 @@
 # cTaskDialog64
 cTaskDialog (TaskDialogIndirect implementation) universally compatible with VB6/VBA7/twinBASIC x86/x64\
-(UPDATE: NOW FULLY WORKING IN VBA64!)
+(UPDATE: NOW FULLY WORKING IN VBA64! Note: You must update mTDHelper.bas too.)
 
 ![Screenshot1](https://i.imgur.com/AQEvO9W.gif) ![Screenshot2](https://i.imgur.com/8VvddRR.gif)
 
@@ -12,7 +12,7 @@ This is a version of my [cTaskDialog project](https://www.vbforums.com/showthrea
 Since people have asked about using this in VBA, it goes back to the earlier method of using a module to help with subclassing, as the self-subclass code in the last VB6 version only works in VB6, and while twinBASIC supports AddressOf on class members, VBA7 does not. Note that there's a bug in the self-sub version that changes the way multiple pages are handled, sending all events through the first page class. So if you use multiple paged Task Dialogs, you'll now need to relocate events for the other pages to their own event Subs (the Demo does this with it's multi-page Demos).
 
 ### Updates
-(28 Sep 2023) Courtesy of brilliant programmer The trick, a fix has finally been identified for use of the callbacks in VBA64.
+(28 Sep 2023) Courtesy of brilliant programmer The trick, a fix has finally been identified for use of the callbacks in VBA 64bit. Note: You must update mTDHelper.bas too.
 
 (23 Nov 2022) Updated to version 1.2.4. Fixed improper VarPtr calls in VBA7x64 routines.
 
