@@ -14,12 +14,12 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.3.7 Universal Compatibility Version
+'cTaskDialog v1.3.8 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
 'Originally Released 21 March 2020
-'x64 Version released 21 October 2022; update 28 Sep 2023
+'x64 Version released 21 October 2022; update 30 Sep 2023
 '************************************************************
 '
 '
@@ -51,6 +51,8 @@ Option Explicit
 '
 '*************************************************
 'VERSION HISTORY
+'
+'Version 1.3.8 - Custom button handling for VBA 7 x64 has now been implemented.
 '
 'Version 1.3.7 **REALLY UNIVERSAL**!!
 'Thanks to brilliant VBForums user The trick, the crashing in VBA64 has been eliminated
@@ -712,7 +714,6 @@ End Type
 #If VBA7 Then
 	
     #If (Win64 <> 0) And (TWINBASIC = 0) Then
-    	
         'VBA7 does not support the packing alignment attribute that makes calling this easy in twinBASIC; x64 inserts padding this particular API doesn't expect.
         Private Type TASKDIALOG_BUTTON_VBA7
             data(11) As Byte
@@ -2256,6 +2257,35 @@ Else
     uTDC.pszFooterIcon = tdMakeIntResource(CLng(m_IconFooter))
 End If
 
+#If (Win64 <> 0) And (TWINBASIC = 0) Then
+'#If True Then
+Dim p As Long
+ReDim m_uButtons_VBA7(0)
+ReDim m_uRadioButtons_VBA7(0)
+If m_HasCustomButtons Then
+    uTDC.cButtons = UBound(m_uButtons) + 1
+    ReDim m_uButtons_VBA7(UBound(m_uButtons))
+    For p = 0 To UBound(m_uButtons)
+    	CopyMemory m_uButtons_VBA7(p).data(0), m_uButtons(p).nButtonID, 4
+        CopyMemory m_uButtons_VBA7(p).data(4), m_uButtons(p).pszButtonText, 8
+    Next
+Else
+    uTDC.cButtons = 0
+End If
+uTDC.pButtons = VarPtr(m_uButtons_VBA7(0).data(0))
+
+If m_HasRadioButtons Then
+    uTDC.cRadioButtons = UBound(m_uRadioButtons) + 1
+    ReDim m_uRadioButtons_VBA7(UBound(m_uRadioButtons))
+    For p = 0 To UBound(m_uRadioButtons)
+        CopyMemory m_uRadioButtons_VBA7(p).data(0), m_uRadioButtons(p).nButtonID, 4
+        CopyMemory m_uRadioButtons_VBA7(p).data(4), m_uRadioButtons(p).pszButtonText, 8
+    Next
+Else
+    uTDC.cRadioButtons = 0
+End If
+uTDC.pRadioButtons = VarPtr(m_uRadioButtons_VBA7(0).data(0))
+#Else
 If m_HasCustomButtons Then
     uTDC.cButtons = UBound(m_uButtons) + 1
 Else
@@ -2269,6 +2299,7 @@ Else
     uTDC.cRadioButtons = 0
 End If
 uTDC.pRadioButtons = VarPtr(m_uRadioButtons(0).nButtonID)
+#End If
 
 If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID) Then
     uTDC.hInstance = hShell32
@@ -2863,6 +2894,40 @@ ReDim uBTN(0)
 ReDim uRBN(0)
 With uTDC2
     .cbSize = Len(uTDC2)
+    
+    #If (Win64 <> 0) And (TWINBASIC = 0) Then
+    Dim uBTN_VBA7() As TASKDIALOG_BUTTON_VBA7, uRBN_VBA7() As TASKDIALOG_BUTTON_VBA7
+    ReDim uBTN_VBA7(0)
+    ReDim uRBN_VBA7(0)
+    If (UBound(lBtn) = 0) And (lBtn(0) = 0) Then
+        .cButtons = 0
+    Else
+        .cButtons = UBound(lBtn) + 1
+        ReDim uBTN(UBound(lBtn))
+        ReDim uBTN_VBA7(UBound(lBtn))
+        For i = 0 To UBound(lBtn)
+            uBTN(i).nButtonID = lBtn(i)
+            CopyMemory uBTN_VBA7(i).data(0), lBtn(i), 4
+            uBTN(i).pszButtonText = StrPtr(sBTN(i))
+            CopyMemory uBTN_VBA7(i).data(4), uBTN(i).pszButtonText, 8
+        Next i
+    End If
+    .pButtons = VarPtr(uBTN_VBA7(0).data(0))
+    If (UBound(lRBN) = 0) And (lRBN(0) = 0) Then
+        .cRadioButtons = 0
+    Else
+        .cRadioButtons = UBound(lRBN) + 1
+        ReDim uRBN(UBound(lRBN))
+        ReDim uRBN_VBA7(UBound(lRBN))
+        For i = 0 To UBound(lRBN)
+            uRBN(i).nButtonID = lRBN(i)
+            CopyMemory uRBN_VBA7(i).data(0), lRBN(i), 4
+            uRBN(i).pszButtonText = StrPtr(sRBN(i))
+            CopyMemory uRBN_VBA7(i).data(4), uRBN(i).pszButtonText, 8
+        Next i
+    End If
+    .pRadioButtons = VarPtr(uRBN_VBA7(0).data(0))
+    #Else
     If (UBound(lBtn) = 0) And (lBtn(0) = 0) Then
         .cButtons = 0
     Else
@@ -2884,8 +2949,8 @@ With uTDC2
             uRBN(i).pszButtonText = StrPtr(sRBN(i))
         Next i
     End If
-    
     .pRadioButtons = VarPtr(uRBN(0).nButtonID)
+    #End If
     .CXWidth = cTD.Width
     .dwCommonButtons = cTD.CommonButtons
     .dwFlags = cTD.Flags
