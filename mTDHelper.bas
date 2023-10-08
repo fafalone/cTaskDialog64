@@ -14,25 +14,25 @@ Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Des
 Private Declare PtrSafe Sub ZeroMemory Lib "kernel32" Alias "RtlZeroMemory" (Destination As Any, ByVal Length As LongPtr)
 #End If
 Public Sub MagicalTDInitFunction()
-	'The trick is a GENIUS!
+    'The trick is a GENIUS!
     'He identified the bug in VBA64 that had been causing the crashing.
     'As if by magic, calling this from Class_Initialize resolves the problem.
 End Sub
-Public Function TaskDialogCallbackProc(ByVal hwnd As LongPtr, ByVal uNotification As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr, ByVal lpRefData As LongPtr) As LongPtr
+Public Function TaskDialogCallbackProc(ByVal hWnd As LongPtr, ByVal uNotification As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr, ByVal lpRefData As LongPtr) As LongPtr
 Dim cTD As cTaskDialog
 CopyMemory cTD, lpRefData, LenB(lpRefData)
-TaskDialogCallbackProc = cTD.zz_ProcessCallback(hwnd, uNotification, wParam, lParam)
+TaskDialogCallbackProc = cTD.zz_ProcessCallback(hWnd, uNotification, wParam, lParam)
 ZeroMemory cTD, LenB(lpRefData)
 End Function
-Public Function TaskDialogEnumChildProc(ByVal hwnd As LongPtr, ByVal lParam As LongPtr) As Long
+Public Function TaskDialogEnumChildProc(ByVal hWnd As LongPtr, ByVal lParam As LongPtr) As Long
 Dim cTD As cTaskDialog
 CopyMemory cTD, lParam, LenB(lParam)
-TaskDialogEnumChildProc = cTD.zz_ProcessEnumCallback(hwnd)
+TaskDialogEnumChildProc = cTD.zz_ProcessEnumCallback(hWnd)
 ZeroMemory cTD, LenB(lParam)
 End Function
-Public Function TaskDialogSubclassProc(ByVal hwnd As LongPtr, ByVal uMsg As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr, ByVal uIdSubclass As LongPtr, ByVal dwRefData As LongPtr) As LongPtr
+Public Function TaskDialogSubclassProc(ByVal hWnd As LongPtr, ByVal uMsg As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr, ByVal uIdSubclass As LongPtr, ByVal dwRefData As LongPtr) As LongPtr
 Dim cTD As cTaskDialog
 CopyMemory cTD, dwRefData, LenB(dwRefData)
-TaskDialogSubclassProc = cTD.zz_ProcessSubclass(hwnd, uMsg, wParam, lParam, uIdSubclass)
+TaskDialogSubclassProc = cTD.zz_ProcessSubclass(hWnd, uMsg, wParam, lParam, uIdSubclass)
 ZeroMemory cTD, LenB(dwRefData)
 End Function
