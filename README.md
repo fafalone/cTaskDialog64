@@ -13,7 +13,7 @@ This is a version of my [cTaskDialog project](https://www.vbforums.com/showthrea
 Since people have asked about using this in VBA, it goes back to the earlier method of using a module to help with subclassing, as the self-subclass code in the last VB6 version only works in VB6, and while twinBASIC supports AddressOf on class members, VBA7 does not. Note that there's a bug in the self-sub version that changes the way multiple pages are handled, sending all events through the first page class. So if you use multiple paged Task Dialogs, you'll now need to relocate events for the other pages to their own event Subs (the Demo does this with it's multi-page Demos).
 
 > [!NOTE]
-> You can find a number of tutorials for the examples on the [original VB6 project page]((https://www.vbforums.com/showthread.php?777021-VB6-TaskDialogIndirect-Complete-class-implementation-of-Vista-Task-Dialogs).
+> You can find a number of tutorials for the examples on the [original VB6 project page](https://www.vbforums.com/showthread.php?777021-VB6-TaskDialogIndirect-Complete-class-implementation-of-Vista-Task-Dialogs).
 
 ### Updates
 (30 Sep 2023) In my excitement over callbacks finally working, I forgot that I had not implemented the `TASKDIALOG_BUTTON_VBA7` alternates for custom buttons. This has now been implemented and basic functionality verified. Please notify of any issues.
