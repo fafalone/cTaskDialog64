@@ -1,7 +1,9 @@
 # cTaskDialog64
-cTaskDialog (TaskDialogIndirect implementation) universally compatible with VB6/VBA7/twinBASIC x86/x64\
-(NEWER UPDATE: Custom buttons now fixed in VBA64)\
-(UPDATE: NOW FULLY WORKING IN VBA64! Note: You must update mTDHelper.bas too.)
+### Current Version: v1.3.8 Universal Compatibility Version
+
+cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64\
+**Update (v1.3.8, 30 Sep 2023):** Fix for custom buttons in VBA64.\
+**Update (v1.3.7, 28 Sep 2023):** NOW FULLY WORKING IN VBA64! Note: You must update mTDHelper.bas too.)
 
 ![Screenshot1](https://i.imgur.com/AQEvO9W.gif) ![Screenshot2](https://i.imgur.com/8VvddRR.gif)
 
