@@ -14,12 +14,16 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.3.8 Universal Compatibility Version
+'cTaskDialog v1.4 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
+'https://github.com/fafalone/cTaskDialog64
+'
+'https://www.vbforums.com/showthread.php?777021
+'
 'Originally Released 21 March 2020
-'x64 Version released 21 October 2022; update 30 Sep 2023
+'x64 Version released 21 October 2022; update 17 Jan 2024
 '************************************************************
 '
 '
@@ -51,6 +55,24 @@ Option Explicit
 '
 '*************************************************
 'VERSION HISTORY
+'Version 1.4.0
+'After review, I've included the undocumented additional common buttons that were used in
+'the AccessUI version (thanks!). The following .CommonButtons are now available, with their 
+'return value given in parentheses:
+' TDCBF_ABORT_BUTTON     (TD_ABORT)
+' TDCBF_IGNORE_BUTTON    (TD_IGNORE)
+' TDCBF_TRYAGAIN_BUTTON  (TD_TRYAGAIN)
+' TDCBF_CONTINUE_BUTTON  (TD_CONTINUE)
+
+' TDCBF_HELP_BUTTON      **This will raise the Help event, and will not close the dialog.**
+'
+'The Help button works everywhere, *including MS Access*. Unfortunately, the AccessUI 
+'version had a typo; the release had 16384 which isn't anything-- but it looks like they
+'just had a typo originally, there's a comment '104857 which of course makes no sense...
+'but if you convert these values to hex, you find &H10000, &H20000, &H40000, and &H80000
+'for the other new buttons... &H100000 is **1048576** in decimal-- so they just cut off a
+'digit when copying it down. &H100000 works in Access, I checked. 
+'
 '
 'Version 1.3.8 - Custom button handling for VBA 7 x64 has now been implemented.
 '
@@ -580,6 +602,15 @@ Public Enum TDBUTTONS
     TDCBF_CANCEL_BUTTON = &H8&  'return value 2 (IDCANCEL)
     TDCBF_RETRY_BUTTON = &H10&   'return value 4 (IDRETRY)
     TDCBF_CLOSE_BUTTON = &H20&   'return value 8 (IDCLOSE)
+    
+    TDCBF_ABORT_BUTTON = &H10000
+    TDCBF_IGNORE_BUTTON = &H20000
+    TDCBF_TRYAGAIN_BUTTON = &H40000
+    TDCBF_CONTINUE_BUTTON = &H80000
+    
+    '// Note: Clicking the "Help" button will not close the dialog, but will
+    '// raise the TaskDialogPage.Help event.
+    TDCBF_HELP_BUTTON = &H100000
 End Enum
 Public Enum TDRESULT
     TD_OK = 1
@@ -588,6 +619,11 @@ Public Enum TDRESULT
     TD_CANCEL = 2
     TD_RETRY = 4
     TD_CLOSE = 8
+ 
+    TD_ABORT = 3
+    TD_IGNORE = 5
+    TD_TRYAGAIN = 10
+    TD_CONTINUE = 11
 End Enum
 Public Enum TASKDIALOG_FLAGS
     TDF_ENABLE_HYPERLINKS = &H1
@@ -712,7 +748,7 @@ Private Type TASKDIALOGCONFIG
 End Type
 
 #If VBA7 Then
-	
+    
     #If (Win64 <> 0) And (TWINBASIC = 0) Then
         'VBA7 does not support the packing alignment attribute that makes calling this easy in twinBASIC; x64 inserts padding this particular API doesn't expect.
         Private Type TASKDIALOG_BUTTON_VBA7
@@ -1169,6 +1205,7 @@ Private Const CBPROC_IDX = 0
 
 '@0
 Public Function zz_ProcessCallback(ByVal hWnd As LongPtr, ByVal uNotification As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr) As LongPtr
+Attribute zz_ProcessCallback.VB_MemberFlags = "400"
 '***DO NOT CALL THIS FUNCTION***
 Dim bSC As Boolean
 
@@ -1359,10 +1396,10 @@ Select Case uNotification
                 If nComboIdx >= 0 Then
                     sComboText = aComboItems(nComboIdx).sText
                 Else
-                	sComboText = ""
+                    sComboText = ""
                 End If
             Else
-            	sComboText = GetComboTextW(hEditCombo)
+                sComboText = GetComboTextW(hEditCombo)
             End If
         End If
         Dim rs As Long
@@ -2266,7 +2303,7 @@ If m_HasCustomButtons Then
     uTDC.cButtons = UBound(m_uButtons) + 1
     ReDim m_uButtons_VBA7(UBound(m_uButtons))
     For p = 0 To UBound(m_uButtons)
-    	CopyMemory m_uButtons_VBA7(p).data(0), m_uButtons(p).nButtonID, 4
+        CopyMemory m_uButtons_VBA7(p).data(0), m_uButtons(p).nButtonID, 4
         CopyMemory m_uButtons_VBA7(p).data(4), m_uButtons(p).pszButtonText, 8
     Next
 Else
@@ -2822,7 +2859,7 @@ Dim lRet As Long
 nci.cbSize = LenB(nci)
 lRet = SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, LenB(nci), nci, 0)
 If lRet Then
-	nci.lfMessageFont.LFHeight = -((9 * dpi) / 72)
+    nci.lfMessageFont.LFHeight = -((9 * dpi) / 72)
     m_hFontDisp = CreateFontIndirectW(nci.lfMessageFont)
 End If
 If m_hFontDisp = 0 Then m_hFontDisp = GetStockObject(DEFAULT_GUI_FONT) 'fallback
@@ -2830,7 +2867,7 @@ Dim sMinMaxEffect As String
 sMinMaxEffect = GetRegistryValueW(HKEY_CURRENT_USER, "Control Panel\Desktop\WindowMetrics", "MinAnimate")
 If sMinMaxEffect = "1" Then
     mMinMaxEffectEnabled = True
-	nTmrDelay = 5
+    nTmrDelay = 5
 Else
     nTmrDelay = 0
 End If
@@ -4490,6 +4527,7 @@ End Function
 
 '@3
 Public Function zz_ProcessEnumCallback(ByVal hWnd As LongPtr) As Long
+Attribute zz_ProcessEnumCallback.VB_MemberFlags = "400"
 Dim ub As Long
 Dim sClass As String
 Dim np As Long
@@ -4615,6 +4653,7 @@ End Function
 
 '@1
 Public Function zz_ProcessSubclass(ByVal lng_hWnd As LongPtr, ByVal uMsg As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr, ByVal uIdSubclass As LongPtr) As LongPtr
+Attribute zz_ProcessSubclass.VB_MemberFlags = "400"
 On Error GoTo e0
 'DebugAppend "TDSC uMsg=" & CStr(uMsg)
 Select Case uMsg
