@@ -1,7 +1,27 @@
 # cTaskDialog64
-### Current Version: v1.3.8 Universal Compatibility Version
+### Current Version: v1.4 Universal Compatibility Version
 
 cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64\
+**Update (v1.4, 17 Jan 2024):**
+After review, I've included the undocumented additional common buttons that were used in the AccessUI version (thanks!). The following .CommonButtons are now available, with their return value given in parentheses:\
+
+```vba
+TDCBF_ABORT_BUTTON     (TD_ABORT)
+TDCBF_IGNORE_BUTTON    (TD_IGNORE)
+TDCBF_TRYAGAIN_BUTTON  (TD_TRYAGAIN)
+TDCBF_CONTINUE_BUTTON  (TD_CONTINUE)
+
+TDCBF_HELP_BUTTON      **This will raise the Help Event, and will not close the dialog.**
+```
+
+The Help button works everywhere, *including MS Access*. Unfortunately, the AccessUI 
+version had a typo; the release had 16384 which isn't anything-- but it looks like they
+just had a typo originally, there's a comment '104857 which of course makes no sense...
+but if you convert these values to hex, you find &H10000, &H20000, &H40000, and &H80000
+for the other new buttons... &H100000 is **1048576** in decimal-- so they just cut off a
+digit when copying it down. &H100000 works in Access, I checked. 
+
+
 **Update (v1.3.8, 30 Sep 2023):** Fix for custom buttons in VBA64.\
 **Update (v1.3.7, 28 Sep 2023):** NOW FULLY WORKING IN VBA64! Note: You must update mTDHelper.bas too.)
 
