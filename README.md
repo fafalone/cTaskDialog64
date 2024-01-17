@@ -11,7 +11,7 @@ TDCBF_IGNORE_BUTTON    (TD_IGNORE)
 TDCBF_TRYAGAIN_BUTTON  (TD_TRYAGAIN)
 TDCBF_CONTINUE_BUTTON  (TD_CONTINUE)
 
-TDCBF_HELP_BUTTON      **This will raise the Help Event, and will not close the dialog.**
+TDCBF_HELP_BUTTON      '**This will raise the Help Event, and will not close the dialog.**
 ```
 
 The Help button works everywhere, *including MS Access*. Unfortunately, the AccessUI 
