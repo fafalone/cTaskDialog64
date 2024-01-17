@@ -3,10 +3,10 @@
    <assemblyIdentity
       type="win32"
       processorArchitecture="*"
-      name="My_twinBASIC_Application"
+      name="cTaskDialog"
       version="1.0.0.0"
    />
-   <description>Application description here</description>
+   <description>cTaskDialog Comctl6 Manifest</description>
    <dependency>
       <dependentAssembly>
          <assemblyIdentity

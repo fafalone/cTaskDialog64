@@ -84,6 +84,29 @@ Public gdipInitToken As LongPtr
 Public Declare PtrSafe Function GetDC Lib "user32" (ByVal hWnd As LongPtr) As LongPtr
 Public Declare PtrSafe Function DeleteObject Lib "gdi32" (ByVal hObject As LongPtr) As Long
 
+Public Enum ImageTypes
+  IMAGE_BITMAP = 0
+  IMAGE_ICON = 1
+  IMAGE_CURSOR = 2
+  IMAGE_ENHMETAFILE = 3
+End Enum
+Public Enum LoadResourceFlags
+  LR_DEFAULTCOLOR = &H0
+  LR_MONOCHROME = &H1
+  LR_COLOR = &H2
+  LR_COPYRETURNORG = &H4
+  LR_COPYDELETEORG = &H8
+  LR_LOADFROMFILE = &H10
+  LR_LOADTRANSPARENT = &H20
+  LR_DEFAULTSIZE = &H40
+  LR_VGACOLOR = &H80
+  LR_LOADMAP3DCOLORS = &H1000
+  LR_CREATEDIBSECTION = &H2000
+  LR_COPYFROMRESOURCE = &H4000
+  LR_SHARED = &H8000&
+End Enum
+
+Public Declare PtrSafe Function LoadImageA Lib "user32" (ByVal hInst As LongPtr, ByVal lpsz As String, ByVal dwImageType As ImageTypes, ByVal dwDesiredWidth As Long, ByVal dwDesiredHeight As Long, ByVal dwFlags As LoadResourceFlags) As LongPtr
 
  Public Function InitGDIPlus() As LongPtr
     Dim Token    As LongPtr
@@ -152,7 +175,8 @@ Public Function ResIconToHICON(id As String, Optional CX As Long = 24, Optional 
     
 On Error GoTo e0
 
-    bytIcoData = LoadResData(id, "CUSTOM")
+    'bytIcoData = LoadResData(id, "CUSTOM")
+    
     Call CopyMemory(tIconHeader, bytIcoData(0), Len(tIconHeader))
 
     If tIconHeader.ihCount >= 1 Then

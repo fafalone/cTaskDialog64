@@ -321,28 +321,46 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     End Sub
     
     Private Sub Command2_Click()
+    Set TaskDialog1 = New cTaskDialog
     With TaskDialog1
-        .Init
-        .MainInstruction = "test"
-    '    .Flags = TDF_CAN_BE_MINIMIZED 'TDF_KILL_SHIELD_ICON
-    '    .Flags = TDF_ALLOW_DIALOG_CANCELLATION
-        .Content = "This is a simple dialog."
-        .CommonButtons = TDCBF_YES_BUTTON Or TDCBF_CLOSE_BUTTON Or TDF_ALLOW_DIALOG_CANCELLATION 'Or TDCBF_CANCEL_BUTTON
-        .IconMain = IDI_ERROR
-        .Title = "cTaskDialog Project"
+        .Content = "Message text"
+        .CommonButtons = TDCBF_ABORT_BUTTON Or TDCBF_IGNORE_BUTTON Or TDCBF_TRYAGAIN_BUTTON Or TDCBF_CONTINUE_BUTTON Or TDCBF_HELP_BUTTON
+        .Flags = TDF_POSITION_RELATIVE_TO_WINDOW
         .ParenthWnd = Me.hWnd
-    '    .hinst = 0
         .ShowDialog
-    
-        If .ResultMain = TD_YES Then
-            Label1.Caption = "Yes Yes Yes!"
-        ElseIf .ResultMain = TD_NO Then
-            Label1.Caption = "Nope. No. Non. Nein."
-        Else
-            Label1.Caption = "Cancelled."
-        End If
+        'If .ResultMain = TD_OK Then
+            Debug.Print "You clicked " & .ResultMain
+        'Else
+       '     Debug.Print "Canceled."
+        'End If
     End With
+    ' With TaskDialog1
+    '     .Init
+    '     .MainInstruction = "test"
+    ' '    .Flags = TDF_CAN_BE_MINIMIZED 'TDF_KILL_SHIELD_ICON
+    ' '    .Flags = TDF_ALLOW_DIALOG_CANCELLATION
+    '     .Content = "This is a simple dialog."
+    '     .CommonButtons = TDCBF_YES_BUTTON Or TDCBF_CLOSE_BUTTON Or TDF_ALLOW_DIALOG_CANCELLATION 'Or TDCBF_CANCEL_BUTTON
+    '     .IconMain = IDI_ERROR
+    '     .Title = "cTaskDialog Project"
+    '     .ParenthWnd = Me.hWnd
+    ' '    .hinst = 0
+    '     .ShowDialog
+    
+    '     If .ResultMain = TD_YES Then
+    '         Label1.Caption = "Yes Yes Yes!"
+    '     ElseIf .ResultMain = TD_NO Then
+    '         Label1.Caption = "Nope. No. Non. Nein."
+    '     Else
+    '         Label1.Caption = "Cancelled."
+    '     End If
+    ' End With
     End Sub
+    
+    Private Sub TaskDialog1_Help() Handles TaskDialog1.Help
+        Debug.Print "help event fired"
+    End Sub
+    
     
     Private Sub Command20_Click()
     With TaskDialog1
@@ -1063,7 +1081,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         If TaskDialog1.DPIScaleX > 1 Then
             sImg = App.Path & "\disc48.png"
         Else
-        	sImg = App.Path & "\disc32.png"
+            sImg = App.Path & "\disc32.png"
         End If
         hBmp = hBitmapFromFile(sImg, CX, CY)
     '    hBmp = LoadImageW(0, StrPtr(simg), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE)

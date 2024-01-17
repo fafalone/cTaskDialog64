@@ -22,6 +22,7 @@
 			"path32": "",
 			"path64": "",
 			"publisher": "TWINBASIC-COMPILER",
+			"symbolId": "",
 			"versionBuild": 0,
 			"versionMajor": 0,
 			"versionMinor": 0,
@@ -42,8 +43,9 @@
 			"id": "{00020430-0000-0000-C000-000000000046}",
 			"lcid": 0,
 			"name": "OLE Automation",
-			"path32": "..\\..\\..\\Windows\\SysWOW64\\stdole2.tlb",
-			"path64": "..\\..\\..\\Windows\\SysWOW64\\stdole2.tlb",
+			"path32": "C:\\Windows\\SysWOW64\\stdole2.tlb",
+			"path64": "C:\\Windows\\System32\\stdole2.tlb",
+			"symbolId": "stdole",
 			"versionMajor": 2,
 			"versionMinor": 0
 		}
@@ -58,7 +60,7 @@
 	"project.versionMajor": 1,
 	"project.versionMinor": 3,
 	"project.versionProductName": "cTaskDialog Sample Project",
-	"project.versionRevision": 25,
+	"project.versionRevision": 26,
 	"project.warnings": {
 		"errors": [],
 		"ignored": []
