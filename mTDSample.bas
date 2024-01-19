@@ -9,8 +9,42 @@ Option Explicit
 
 'Icon code was mostly written by Leandro Ascierto, from his clsMenuImage.
 'I've simply modified the resource->hicon function to stand alone
+#If VBA7 Then
 Public Declare PtrSafe Function DestroyIcon Lib "user32.dll" (ByVal hIcon As LongPtr) As Long
-
+Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
+Private Declare PtrSafe Function CreateIconFromResourceEx Lib "user32.dll" (ByRef presbits As Any, ByVal dwResSize As Long, ByVal fIcon As Long, ByVal dwVer As Long, ByVal cxDesired As Long, ByVal cyDesired As Long, ByVal Flags As Long) As LongPtr
+Private Declare PtrSafe Function CreateIconFromResource Lib "user32.dll" (ByVal presbits As LongPtr, ByVal dwResSize As Long, ByVal fIcon As Long, ByVal dwVer As Long) As LongPtr
+Private Declare PtrSafe Function LookupIconIdFromDirectoryEx Lib "user32.dll" (ByVal presbits As LongPtr, ByVal fIcon As Long, ByVal cxDesired As Long, ByVal cyDesired As Long, ByVal Flags As Long) As Long
+Private Declare PtrSafe Function SHGetFileInfo Lib "shell32" Alias "SHGetFileInfoA" (ByVal pszPath As Any, ByVal dwFileAttributes As Long, psfi As SHFILEINFO, ByVal cbFileInfo As Long, ByVal uFlags As SHGFI_flags) As LongPtr
+Public Declare PtrSafe Function GdipLoadImageFromFile Lib "gdiplus.dll" (ByVal FileName As LongPtr, GpImage As LongPtr) As Long
+Public Declare PtrSafe Function GdipGetImageWidth Lib "gdiplus.dll" (ByVal Image As LongPtr, Width As Long) As Long
+Public Declare PtrSafe Function GdipGetImageHeight Lib "gdiplus.dll" (ByVal Image As LongPtr, Height As Long) As Long
+Public Declare PtrSafe Function GdipCreateHBITMAPFromBitmap Lib "GDIPlus" (ByVal BITMAP As LongPtr, hbmReturn As LongPtr, ByVal background As LongPtr) As Long
+Public Declare PtrSafe Function GdipDisposeImage Lib "GDIPlus" (ByVal image As LongPtr) As Long
+Public Declare PtrSafe Function GdiplusStartup Lib "gdiplus" (ByRef token As LongPtr, ByRef lpInput As GdiplusStartupInput, ByRef lpOutput As Long) As Long
+Public Declare PtrSafe Function GdiplusShutdown Lib "gdiplus" (ByVal token As LongPtr) As Long
+Public Declare PtrSafe Function GetDC Lib "user32" (ByVal hWnd As LongPtr) As LongPtr
+Public Declare PtrSafe Function DeleteObject Lib "gdi32" (ByVal hObject As LongPtr) As Long
+Public Declare PtrSafe Function LoadImageA Lib "user32" (ByVal hInst As LongPtr, ByVal lpsz As String, ByVal dwImageType As ImageTypes, ByVal dwDesiredWidth As Long, ByVal dwDesiredHeight As Long, ByVal dwFlags As LoadResourceFlags) As LongPtr
+#Else
+Public Declare Function DestroyIcon Lib "user32.dll" (ByVal hIcon As LongPtr) As Long
+Private Declare Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
+Private Declare Function CreateIconFromResourceEx Lib "user32.dll" (ByRef presbits As Any, ByVal dwResSize As Long, ByVal fIcon As Long, ByVal dwVer As Long, ByVal cxDesired As Long, ByVal cyDesired As Long, ByVal Flags As Long) As LongPtr
+Private Declare Function CreateIconFromResource Lib "user32.dll" (ByVal presbits As LongPtr, ByVal dwResSize As Long, ByVal fIcon As Long, ByVal dwVer As Long) As LongPtr
+Private Declare Function LookupIconIdFromDirectoryEx Lib "user32.dll" (ByVal presbits As LongPtr, ByVal fIcon As Long, ByVal cxDesired As Long, ByVal cyDesired As Long, ByVal Flags As Long) As Long
+Private Declare Function SHGetFileInfo Lib "shell32" Alias "SHGetFileInfoA" (ByVal pszPath As Any, ByVal dwFileAttributes As Long, psfi As SHFILEINFO, ByVal cbFileInfo As Long, ByVal uFlags As SHGFI_flags) As LongPtr
+Public Declare Function GdipLoadImageFromFile Lib "gdiplus.dll" (ByVal FileName As LongPtr, GpImage As LongPtr) As Long
+Public Declare Function GdipGetImageWidth Lib "gdiplus.dll" (ByVal Image As LongPtr, Width As Long) As Long
+Public Declare Function GdipGetImageHeight Lib "gdiplus.dll" (ByVal Image As LongPtr, Height As Long) As Long
+Public Declare Function GdipCreateHBITMAPFromBitmap Lib "GDIPlus" (ByVal BITMAP As LongPtr, hbmReturn As LongPtr, ByVal background As LongPtr) As Long
+Public Declare Function GdipDisposeImage Lib "GDIPlus" (ByVal image As LongPtr) As Long
+Public Declare Function GdiplusStartup Lib "gdiplus" (ByRef token As LongPtr, ByRef lpInput As GdiplusStartupInput, ByRef lpOutput As Long) As Long
+Public Declare Function GdiplusShutdown Lib "gdiplus" (ByVal token As LongPtr) As Long
+Public Declare Function GetDC Lib "user32" (ByVal hWnd As LongPtr) As LongPtr
+Public Declare Function DeleteObject Lib "gdi32" (ByVal hObject As LongPtr) As Long
+Public Declare Function LoadImageA Lib "user32" (ByVal hInst As LongPtr, ByVal lpsz As String, ByVal dwImageType As ImageTypes, ByVal dwDesiredWidth As Long, ByVal dwDesiredHeight As Long, ByVal dwFlags As LoadResourceFlags) As LongPtr
+#End If
+Public gdipInitToken As LongPtr
 Private Const MAX_PATH = 260
 
 Private Type IconHeader
@@ -29,12 +63,6 @@ Private Type IconEntry
     ieBytesInRes    As Long
     ieImageOffset   As Long
 End Type
-Private Declare PtrSafe Sub CopyMemory Lib "kernel32" Alias "RtlMoveMemory" (Destination As Any, Source As Any, ByVal Length As LongPtr)
-
-Private Declare PtrSafe Function CreateIconFromResourceEx Lib "user32.dll" (ByRef presbits As Any, ByVal dwResSize As Long, ByVal fIcon As Long, ByVal dwVer As Long, ByVal cxDesired As Long, ByVal cyDesired As Long, ByVal Flags As Long) As LongPtr
-
-Private Declare PtrSafe Function CreateIconFromResource Lib "user32.dll" (ByVal presbits As LongPtr, ByVal dwResSize As Long, ByVal fIcon As Long, ByVal dwVer As Long) As LongPtr
-Private Declare PtrSafe Function LookupIconIdFromDirectoryEx Lib "user32.dll" (ByVal presbits As LongPtr, ByVal fIcon As Long, ByVal cxDesired As Long, ByVal cyDesired As Long, ByVal Flags As Long) As Long
 Private Type SHFILEINFO   ' shfi
   hIcon As Long
   iIcon As Long
@@ -42,7 +70,6 @@ Private Type SHFILEINFO   ' shfi
   szDisplayName As String * MAX_PATH
   szTypeName As String * 80
 End Type
-Private Declare PtrSafe Function SHGetFileInfo Lib "shell32" Alias "SHGetFileInfoA" (ByVal pszPath As Any, ByVal dwFileAttributes As Long, psfi As SHFILEINFO, ByVal cbFileInfo As Long, ByVal uFlags As SHGFI_flags) As LongPtr
 Public Enum SHGFI_flags
   SHGFI_LARGEICON = &H0            ' sfi.hIcon is large icon
   SHGFI_SMALLICON = &H1            ' sfi.hIcon is small icon
@@ -66,23 +93,12 @@ Public Enum SHGFI_flags
   SHGFI_SELECTED = &H10000        ' sfi.hIcon is selected icon
   SHGFI_ATTR_SPECIFIED = &H20000    ' get only attributes specified in sfi.dwAttributes
 End Enum
-Public Declare PtrSafe Function GdipLoadImageFromFile Lib "gdiplus.dll" (ByVal FileName As LongPtr, GpImage As LongPtr) As Long
-Public Declare PtrSafe Function GdipGetImageWidth Lib "gdiplus.dll" (ByVal Image As LongPtr, Width As Long) As Long
-Public Declare PtrSafe Function GdipGetImageHeight Lib "gdiplus.dll" (ByVal Image As LongPtr, Height As Long) As Long
-Public Declare PtrSafe Function GdipCreateHBITMAPFromBitmap Lib "GDIPlus" (ByVal BITMAP As LongPtr, hbmReturn As LongPtr, ByVal background As LongPtr) As Long
-Public Declare PtrSafe Function GdipDisposeImage Lib "GDIPlus" (ByVal image As LongPtr) As Long
 Public Type GdiplusStartupInput
     GdiplusVersion           As Long
     DebugEventCallback       As LongPtr
     SuppressBackgroundThread As Long
     SuppressExternalCodecs   As Long
 End Type
-Public Declare PtrSafe Function GdiplusStartup Lib "gdiplus" (ByRef token As LongPtr, ByRef lpInput As GdiplusStartupInput, ByRef lpOutput As Long) As Long
-Public Declare PtrSafe Function GdiplusShutdown Lib "gdiplus" (ByVal token As LongPtr) As Long
-
-Public gdipInitToken As LongPtr
-Public Declare PtrSafe Function GetDC Lib "user32" (ByVal hWnd As LongPtr) As LongPtr
-Public Declare PtrSafe Function DeleteObject Lib "gdi32" (ByVal hObject As LongPtr) As Long
 
 Public Enum ImageTypes
   IMAGE_BITMAP = 0
@@ -106,7 +122,6 @@ Public Enum LoadResourceFlags
   LR_SHARED = &H8000&
 End Enum
 
-Public Declare PtrSafe Function LoadImageA Lib "user32" (ByVal hInst As LongPtr, ByVal lpsz As String, ByVal dwImageType As ImageTypes, ByVal dwDesiredWidth As Long, ByVal dwDesiredHeight As Long, ByVal dwFlags As LoadResourceFlags) As LongPtr
 
  Public Function InitGDIPlus() As LongPtr
     Dim Token    As LongPtr
