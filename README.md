@@ -2,6 +2,7 @@
 ### Current Version: v1.4 Universal Compatibility Version
 
 cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64\
+**Update (v1.4, 19 Jan 2024):** Incorrect versions of mTDSample.bas were being used that did have conditonal PtrSafe declares. This has been fixed in the root dir for the VBP, in the Export dir, in the twinproj, and on VBForums.\
 **Update (v1.4, 17 Jan 2024):**\
 After review, I've included the undocumented additional common buttons that were used in the AccessUI version (thanks!). The following .CommonButtons are now available, with their return value given in parentheses:
 
