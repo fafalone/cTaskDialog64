@@ -1,7 +1,7 @@
 # cTaskDialog64
 ### Current Version: v1.4 Universal Compatibility Version
 
-**Quick Start:** Add cTaskDialog.cls and mTDHelper.bas to your project-- this are the only two required files for your code.
+**Quick Start:** Add cTaskDialog.cls and mTDHelper.bas to your project-- these are the only two required files for your code.
 
 
 cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64\
