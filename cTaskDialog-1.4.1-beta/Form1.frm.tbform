@@ -77,7 +77,7 @@
 			"showGrid": true,
 			"showOutlines": false
 		},
-		"__lastUpdateMarker": 1514209657,
+		"__lastUpdateMarker": 2773576598,
 		"_children": [
 			{
 				"Alignment": "vbLeftJustify",
@@ -1971,9 +1971,7 @@
 				"WhatsThisHelpID": 0,
 				"Width": 99,
 				"_className": "CommandButton",
-				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
-				"_designerClick": 1114167,
-				"_propertyChanged__designerClick": true
+				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Anchors": {

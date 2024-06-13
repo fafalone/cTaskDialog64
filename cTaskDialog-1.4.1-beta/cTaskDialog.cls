@@ -982,6 +982,7 @@ Private hUI As LongPtr
 Private sEditText As String
 Private sComboText As String
 Private nComboIdx As Long
+Private nComboNewIndex As Long
 Private lButtonY As Long
 Private lButtonX As Long
 Private lButtonY2 As Long
@@ -1674,6 +1675,8 @@ Public Property Get ComboDropWidth() As Long: ComboDropWidth = cxCBDrop: End Pro
 Public Property Let ComboHeight(CY As Long): cyCombo = CY: End Property
 Public Property Get ComboHeight() As Long: ComboHeight = cyCombo: End Property
 
+Public Property Get ComboNewIndex() As Long: ComboNewIndex = nComboNewIndex: End Property
+    
 Public Property Let SliderAlign(nAlign As TDInputBoxAlign): nSliderAlign = nAlign: End Property
 Public Property Get SliderAlign() As TDInputBoxAlign: SliderAlign = nSliderAlign: End Property
 
@@ -2112,6 +2115,7 @@ If aComboItems(0).sText = "" Then
     aComboItems(0).iImage = iImage
     aComboItems(0).iOverlay = iOverlay
     aComboItems(0).lpData = lParam
+    nComboNewIndex = 0
     Exit Sub
 End If
 ReDim Preserve aComboItems(UBound(aComboItems) + 1)
@@ -2119,6 +2123,7 @@ aComboItems(UBound(aComboItems)).sText = sText
 aComboItems(UBound(aComboItems)).iImage = iImage
 aComboItems(UBound(aComboItems)).iOverlay = iOverlay
 aComboItems(UBound(aComboItems)).lpData = lParam
+nComboNewIndex = UBound(aComboItems)
 If hCombo Then
     CBX_InsertItem hCombo, sText, iImage, iOverlay, lParam
 End If
@@ -3277,7 +3282,7 @@ Dim i As Long
             Call SendMessageW(hCombo, CBEM_SETIMAGELIST, 0, ByVal himlCombo)
         End If
         For i = 0 To UBound(aComboItems)
-            CBX_InsertItem hCombo, aComboItems(i).sText, aComboItems(i).iImage, aComboItems(i).iOverlay
+            CBX_InsertItem hCombo, aComboItems(i).sText, aComboItems(i).iImage, aComboItems(i).iOverlay, aComboItems(i).lpData
         Next i
         If bCBInitValid Then
             Dim cbxi As COMBOBOXEXITEMW
