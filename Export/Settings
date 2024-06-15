@@ -7,6 +7,7 @@
 	"project.conditionalCompilationArguments": "",
 	"project.description": "cTaskDialog Sample Project",
 	"project.exportPathIsV2": true,
+	"project.forceDpiAwarenessAtStartup": "NONE",
 	"project.id": "{98476A03-DCCC-449D-A587-1A9CAF5752FB}",
 	"project.licence": "MIT",
 	"project.name": "cTaskDialogDemo",
@@ -18,26 +19,15 @@
 			"isCompilerPackage": true,
 			"lcid": 0,
 			"licence": "MIT",
-			"name": "[COMPILER PACKAGE] WinNativeForms Package",
+			"name": "[COMPILER PACKAGE] twinBASIC - VB Compatibility Package (Forms)",
 			"path32": "",
 			"path64": "",
 			"publisher": "TWINBASIC-COMPILER",
-			"symbolId": "",
+			"symbolId": "VB",
 			"versionBuild": 0,
 			"versionMajor": 0,
 			"versionMinor": 0,
 			"versionRevision": 31
-		},
-		{
-			"id": "{D63CB78D-9F5B-42FE-B94C-A545F2B2BFC3}",
-			"isCompilerPackage": true,
-			"licence": "MIT",
-			"name": "[COMPILER PACKAGE] WinNativeCommonCtls Package",
-			"publisher": "TWINBASIC-COMPILER",
-			"versionBuild": 0,
-			"versionMajor": 0,
-			"versionMinor": 0,
-			"versionRevision": 1
 		},
 		{
 			"id": "{00020430-0000-0000-C000-000000000046}",
@@ -53,17 +43,19 @@
 	"project.settingsVersion": 1,
 	"project.startupObject": "Form1",
 	"project.versionAutoIncrement": "Revision",
-	"project.versionBuild": 7,
+	"project.versionBuild": 0,
 	"project.versionCompanyName": "Fafalonian Productions",
 	"project.versionFileDescription": "cTaskDialogDemo",
 	"project.versionLegalCopyright": "©2014 -2022",
 	"project.versionMajor": 1,
-	"project.versionMinor": 3,
+	"project.versionMinor": 5,
 	"project.versionProductName": "cTaskDialog Sample Project",
-	"project.versionRevision": 26,
+	"project.versionRevision": 27,
 	"project.warnings": {
 		"errors": [],
-		"ignored": []
+		"hints": [],
+		"ignored": [],
+		"info": []
 	},
 	"runtime.useUnicodeStandardLibrary": true
 }

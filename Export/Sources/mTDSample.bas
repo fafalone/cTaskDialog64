@@ -190,7 +190,7 @@ Public Function ResIconToHICON(id As String, Optional CX As Long = 24, Optional 
     
 On Error GoTo e0
 
-    'bytIcoData = LoadResData(id, "CUSTOM")
+    bytIcoData = LoadResData(id, "CUSTOM")
     
     Call CopyMemory(tIconHeader, bytIcoData(0), Len(tIconHeader))
 

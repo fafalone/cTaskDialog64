@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.4 Universal Compatibility Version
+'cTaskDialog v1.5 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
@@ -23,7 +23,7 @@ Option Explicit
 'https://www.vbforums.com/showthread.php?777021
 '
 'Originally Released 21 March 2020
-'x64 Version released 21 October 2022; update 17 Jan 2024
+'x64 Version released 21 October 2022; update 15 Jun 2024
 '************************************************************
 '
 '
@@ -44,9 +44,10 @@ Option Explicit
 '
 '*************************************************
 'REQUIREMENTS
-'--Common Controls 6.0 are required. Your application, and the VB IDE if running from there,
-'  must include a manifest specifying 6.0. The cTaskDialog sample project includes one in its
-'  resource file.
+'--Common Controls 6.0 are required. This class will attempt to activate it without
+'  a manifest present, but it's strongly recommended you use one as this features 
+'  relies on the undocumented presence of a manifest we can borrow from shell32.dll, 
+'  to avoid needing to distribute a separate file with this class.
 '
 '--mTaskDialogHelper must be added to your project. While twinBASIC supports AddressOf on 
 '  class members, I wanted to retain VBA support too.
@@ -55,6 +56,18 @@ Option Explicit
 '
 '*************************************************
 'VERSION HISTORY
+'Version 1.5.0
+' - Class will now attempt to use comctl32.dll 6.0 in the absence of a manifest, since
+'   it's impactical to add one to 32bit VBA hosts without one, like Excel.
+'   This is activated only immediately prior to the API call and deactivated immediately
+'   after, so it won't impact things like Visual Styles outside this class.
+'
+' - Added lParam options for AddComboItem; obtain from result with ResultComboData.
+'
+' - Custom icons were broken in the main demo project (no issue in this class)
+'
+' - ComboNewIndex property to provide the last added combo item index.
+'
 'Version 1.4.0
 'After review, I've included the undocumented additional common buttons that were used in
 'the AccessUI version (thanks!). The following .CommonButtons are now available, with their 
@@ -300,6 +313,7 @@ Option Explicit
 Private Const useropt_dbg_PrintToImmediate As Boolean = True
 Private Const useropt_dbg_MinLevel As Long = 0&
 Private Const useropt_dbg_IncludeDateTime As Boolean = True
+Private Const useropt_no_force_comctl6 As Boolean = False 'Don't use activation context API
 '********************************************************************************
 
 
@@ -575,6 +589,42 @@ Private Enum COMBOBOXEXITEM_Mask
     CBEIF_DI_SETITEM = &H10000000
 End Enum
 
+Private hActCtx As LongPtr
+Private szSys As String
+Private Enum ActivationContextFlags
+    ACTCTX_FLAG_PROCESSOR_ARCHITECTURE_VALID = (&H1)
+    ACTCTX_FLAG_LANGID_VALID = (&H2)
+    ACTCTX_FLAG_ASSEMBLY_DIRECTORY_VALID = (&H4)
+    ACTCTX_FLAG_RESOURCE_NAME_VALID = (&H8)
+    ACTCTX_FLAG_SET_PROCESS_DEFAULT = (&H10)
+    ACTCTX_FLAG_APPLICATION_NAME_VALID = (&H20)
+    ACTCTX_FLAG_SOURCE_IS_ASSEMBLYREF = (&H40)
+    ACTCTX_FLAG_HMODULE_VALID = (&H80)
+End Enum
+Private Type ACTCTX
+    cbSize As Long
+    dwFlags As ActivationContextFlags
+    lpSource As LongPtr
+    wProcessorArchitecture As Integer
+    wLangId As Integer
+    lpAssemblyDirectory As LongPtr
+    lpResourceName As LongPtr
+    lpApplicationName As LongPtr
+    hModule As LongPtr
+End Type
+Private Enum DeactivateActCtxFlags
+    DEACTIVATE_ACTCTX_FLAG_FORCE_EARLY_DEACTIVATION = (&H1)
+End Enum
+
+Private Type DLLVERSIONINFO
+    cbSize As Long
+    dwMajor As Long
+    dwMinor As Long
+    dwBuildNumber As Long
+    dwPlatformID As Long
+End Type
+
+Private Const INVALID_HANDLE_VALUE = -1&
 
 Public Enum TDICONS
     TD_WARNING_ICON = -1 'exclamation point in a yellow 'yield' triangle (same image as IDI_EXCLAMATION)
@@ -595,7 +645,7 @@ Public Enum TDICONS
 End Enum
 
 'taskdialog common button flags
-Public Enum TDBUTTONS
+Public Enum TASKDIALOG_COMMON_BUTTON_FLAGS
     TDCBF_OK_BUTTON = &H1&      'return value 1 (IDOK)
     TDCBF_YES_BUTTON = &H2&     'return value 6 (IDYES)
     TDCBF_NO_BUTTON = &H4&      'return value 7 (IDNO)
@@ -612,16 +662,19 @@ Public Enum TDBUTTONS
     '// raise the TaskDialogPage.Help event.
     TDCBF_HELP_BUTTON = &H100000
 End Enum
+
+'These are just a custom, nonconflicted version of the MessageBox API returns
+'TD_OK is the same as IDOK, and so on.
 Public Enum TDRESULT
     TD_OK = 1
+    TD_CANCEL = 2
+    TD_ABORT = 3
+    TD_RETRY = 4
+    TD_IGNORE = 5
     TD_YES = 6
     TD_NO = 7
-    TD_CANCEL = 2
-    TD_RETRY = 4
     TD_CLOSE = 8
- 
-    TD_ABORT = 3
-    TD_IGNORE = 5
+    'IDHELP is the corresponding value, but that button doesn't close the box and get returned
     TD_TRYAGAIN = 10
     TD_CONTINUE = 11
 End Enum
@@ -711,21 +764,21 @@ Public Enum TASKDIALOG_ICON_ELEMENTS
     TDIE_ICON_FOOTER = 1
 End Enum
 #If TWINBASIC Then
-[ PackingAlignment (1) ]
+[PackingAlignment(1)]
 #End If
 Private Type TASKDIALOG_BUTTON
     nButtonID As Long
     pszButtonText As LongPtr
 End Type
 #If TWINBASIC Then
-[ PackingAlignment (1) ]
+[PackingAlignment(1)]
 #End If
 Private Type TASKDIALOGCONFIG
     cbSize As Long
     hWndParent As LongPtr
     hInstance As LongPtr
     dwFlags As TASKDIALOG_FLAGS
-    dwCommonButtons As TDBUTTONS
+    dwCommonButtons As TASKDIALOG_COMMON_BUTTON_FLAGS
     pszWindowTitle As LongPtr
     pszMainIcon As LongPtr 'TDICONS
     pszMainInstruction As LongPtr
@@ -748,7 +801,7 @@ Private Type TASKDIALOGCONFIG
 End Type
 
 #If VBA7 Then
-    
+	
     #If (Win64 <> 0) And (TWINBASIC = 0) Then
         'VBA7 does not support the packing alignment attribute that makes calling this easy in twinBASIC; x64 inserts padding this particular API doesn't expect.
         Private Type TASKDIALOG_BUTTON_VBA7
@@ -825,6 +878,11 @@ Private Declare PtrSafe Function SetWindowLong Lib "user32" Alias "SetWindowLong
 #End If
 Private Declare PtrSafe Function lstrlenW Lib "kernel32" (lpString As Any) As Long
 Private Declare PtrSafe Function WideCharToMultiByte Lib "kernel32" (ByVal CodePage As Long, ByVal dwFlags As Long, lpWideCharStr As Any, ByVal cchWideChar As Long, lpMultiByteStr As Any, ByVal cchMultiByte As Long, ByVal lpDefaultChar As String, ByVal lpUsedDefaultChar As Long) As Long
+Private Declare PtrSafe Function DllGetVersion Lib "comctl32" (ByRef pdvi As DLLVERSIONINFO) As Long
+Private Declare PtrSafe Function CreateActCtx Lib "kernel32" Alias "CreateActCtxW" (pActCtx As ACTCTX) As LongPtr
+Private Declare PtrSafe Function ActivateActCtx Lib "kernel32" (ByVal hActCtx As LongPtr, lpCookie As LongPtr) As Long
+Private Declare PtrSafe Function DeactivateActCtx Lib "kernel32" (ByVal dwFlags As DeactivateActCtxFlags, ByVal lpCookie As LongPtr) As Long
+Private Declare PtrSafe Sub ReleaseActCtx Lib "kernel32" (ByVal hActCtx As LongPtr)
                                                                                                                                                                                      
 #Else
 Private Declare Function TaskDialog Lib "comctl32.dll" _
@@ -888,6 +946,11 @@ Private Declare Function RegOpenKeyExW Lib "advapi32" (ByVal hKey As Long, ByVal
 Private Declare Function RegQueryValueExW Lib "advapi32" (ByVal hKey As Long, ByVal lpValueName As Long, lpReserved As Long, ByRef lpType As Long, ByVal szData As Long, ByRef lpcbData As Long) As Long
 Private Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
 Private Declare Function GetModuleHandle Lib "kernel32" Alias "GetModuleHandleW" (ByVal lpModuleName As Long) As Long
+Private Declare Function DllGetVersion Lib "comctl32" (ByRef pdvi As DLLVERSIONINFO) As Long
+Private Declare Function CreateActCtx Lib "kernel32" Alias "CreateActCtxW" (pActCtx As ACTCTX) As Long
+Private Declare Function ActivateActCtx Lib "kernel32" (ByVal hActCtx As Long, lpCookie As Long) As Long
+Private Declare Function DeactivateActCtx Lib "kernel32" (ByVal dwFlags As DeactivateActCtxFlags, ByVal lpCookie As Long) As Long
+Private Declare Sub ReleaseActCtx Lib "kernel32" (ByVal hActCtx As Long)
 
 #End If
 
@@ -975,6 +1038,7 @@ Private hUI As LongPtr
 Private sEditText As String
 Private sComboText As String
 Private nComboIdx As Long
+Private nComboNewIndex As Long
 Private lButtonY As Long
 Private lButtonX As Long
 Private lButtonY2 As Long
@@ -1097,6 +1161,7 @@ Private Type ctdComboItem
     sText As String
     iImage As Long
     iOverlay As Long
+    lpData As LongPtr
 End Type
 Private aComboItems() As ctdComboItem
 Private tComboInit As ctdComboItem
@@ -1396,10 +1461,10 @@ Select Case uNotification
                 If nComboIdx >= 0 Then
                     sComboText = aComboItems(nComboIdx).sText
                 Else
-                    sComboText = ""
+                	sComboText = ""
                 End If
             Else
-                sComboText = GetComboTextW(hEditCombo)
+            	sComboText = GetComboTextW(hEditCombo)
             End If
         End If
         Dim rs As Long
@@ -1474,8 +1539,8 @@ Public Property Get hinst() As LongPtr: hinst = uTDC.hInstance: End Property
 Public Property Get Flags() As TASKDIALOG_FLAGS: Flags = uTDC.dwFlags: End Property
 Public Property Let Flags(dwFlags As TASKDIALOG_FLAGS): uTDC.dwFlags = dwFlags: End Property
 
-Public Property Get CommonButtons() As TDBUTTONS: CommonButtons = uTDC.dwCommonButtons: End Property
-Public Property Let CommonButtons(dwBtns As TDBUTTONS): uTDC.dwCommonButtons = dwBtns: End Property
+Public Property Get CommonButtons() As TASKDIALOG_COMMON_BUTTON_FLAGS: CommonButtons = uTDC.dwCommonButtons: End Property
+Public Property Let CommonButtons(dwBtns As TASKDIALOG_COMMON_BUTTON_FLAGS): uTDC.dwCommonButtons = dwBtns: End Property
 
 Public Property Get Title() As String: Title = m_sTitle: End Property
 Public Property Let Title(sTitle As String)
@@ -1666,6 +1731,8 @@ Public Property Get ComboDropWidth() As Long: ComboDropWidth = cxCBDrop: End Pro
 Public Property Let ComboHeight(CY As Long): cyCombo = CY: End Property
 Public Property Get ComboHeight() As Long: ComboHeight = cyCombo: End Property
 
+Public Property Get ComboNewIndex() As Long: ComboNewIndex = nComboNewIndex: End Property
+    
 Public Property Let SliderAlign(nAlign As TDInputBoxAlign): nSliderAlign = nAlign: End Property
 Public Property Get SliderAlign() As TDInputBoxAlign: SliderAlign = nSliderAlign: End Property
 
@@ -2048,6 +2115,7 @@ Public Property Get ResultVerify() As Long: ResultVerify = m_ResVerify: End Prop
 Public Property Get ResultInput() As String: ResultInput = sEditText: End Property
 Public Property Get ResultComboText() As String: ResultComboText = sComboText: End Property
 Public Property Get ResultComboIndex() As Long: ResultComboIndex = nComboIdx: End Property
+Public Property Get ResultComboData() As Long: ResultComboData = aComboItems(nComboIdx).lpData: End Property
 Public Property Get ResultSlider() As Long: ResultSlider = lSliderValue: End Property
 Public Property Get ResultDateTime() As Date
     If (nDTType = dttDate) Or (nDTType = dttDateWithCheck) Then
@@ -2097,19 +2165,23 @@ Public Property Get hWndComboEdit() As LongPtr: hWndComboEdit = hEditCombo: End 
 Public Property Get hWndDateTime() As LongPtr: hWndDateTime = hDateTime: End Property
 Public Property Get hWndSlider() As LongPtr: hWndSlider = hSlider: End Property
 
-Public Sub ComboAddItem(sText As String, Optional iImage As Long = -1, Optional iOverlay As Long = -1)
+Public Sub ComboAddItem(sText As String, Optional iImage As Long = -1, Optional iOverlay As Long = -1, Optional lParam As LongPtr = 0)
 If aComboItems(0).sText = "" Then
     aComboItems(0).sText = sText
     aComboItems(0).iImage = iImage
     aComboItems(0).iOverlay = iOverlay
+    aComboItems(0).lpData = lParam
+    nComboNewIndex = 0
     Exit Sub
 End If
 ReDim Preserve aComboItems(UBound(aComboItems) + 1)
 aComboItems(UBound(aComboItems)).sText = sText
 aComboItems(UBound(aComboItems)).iImage = iImage
 aComboItems(UBound(aComboItems)).iOverlay = iOverlay
+aComboItems(UBound(aComboItems)).lpData = lParam
+nComboNewIndex = UBound(aComboItems)
 If hCombo Then
-    CBX_InsertItem hCombo, sText, iImage, iOverlay
+    CBX_InsertItem hCombo, sText, iImage, iOverlay, lParam
 End If
 End Sub
 Public Sub zzComboGetItemData(lMax As Long, sText() As String, iImage() As Long, iOverlay() As Long)
@@ -2162,7 +2234,7 @@ End If
 Call SendMessageW(hCombo, CBEM_SETITEMW, 0, cbxi)
 
 End Sub
-Public Function SimpleDialog(sMessage As String, Optional dwBtn As TDBUTTONS = TDCBF_OK_BUTTON, Optional sTitle As String, Optional sMainText As String, Optional dwIco As TDICONS, Optional hWndOwner As LongPtr, Optional hinst As LongPtr) As TDRESULT
+Public Function SimpleDialog(sMessage As String, Optional dwBtn As TASKDIALOG_COMMON_BUTTON_FLAGS = TDCBF_OK_BUTTON, Optional sTitle As String, Optional sMainText As String, Optional dwIco As TDICONS, Optional hWndOwner As LongPtr, Optional hinst As LongPtr) As TDRESULT
    Dim dwIcon As Long
    Dim pnButton As Long
    Dim Success As Long
@@ -2185,6 +2257,10 @@ If sMessage <> "" Then pszContent = StrPtr(sMessage)
 If dwIco Then
    dwIcon = tdMakeIntResource(dwIco)
 End If
+If hActCtx <> INVALID_HANDLE_VALUE Then 'we need to activate comctl32.dll 6.0
+    Dim lActCtxCookie As LongPtr
+    ActivateActCtx hActCtx, lActCtxCookie
+End If
   Call TaskDialog(hWndOwner, _
                         hinst, _
                         pszTitle, _
@@ -2193,7 +2269,9 @@ End If
                         dwBtn, _
                         dwIcon, _
                         pnButton)
-
+  If hActCtx <> INVALID_HANDLE_VALUE Then
+      DeactivateActCtx 0, lActCtxCookie 'Deactivate, because we don't want to interfere with the rest of the app
+  End If
     SimpleDialog = pnButton
 End Function
 
@@ -2303,7 +2381,7 @@ If m_HasCustomButtons Then
     uTDC.cButtons = UBound(m_uButtons) + 1
     ReDim m_uButtons_VBA7(UBound(m_uButtons))
     For p = 0 To UBound(m_uButtons)
-        CopyMemory m_uButtons_VBA7(p).data(0), m_uButtons(p).nButtonID, 4
+    	CopyMemory m_uButtons_VBA7(p).data(0), m_uButtons(p).nButtonID, 4
         CopyMemory m_uButtons_VBA7(p).data(4), m_uButtons(p).pszButtonText, 8
     Next
 Else
@@ -2355,6 +2433,10 @@ uTDC.lpCallbackData = ObjPtr(Me)
 sComboText = ""
 nComboIdx = -1
 
+If hActCtx <> INVALID_HANDLE_VALUE Then 'we need to activate comctl32.dll 6.0
+    Dim lActCtxCookie As LongPtr
+    ActivateActCtx hActCtx, lActCtxCookie
+End If
 #If (VBA7 <> 0) And (TWINBASIC = 0) And (Win64 <> 0) Then
 'Special handling for 64bit VBA7, which doesn't support our manually aligned structure.
     Dim cb As Long
@@ -2367,6 +2449,9 @@ nComboIdx = -1
 #Else
 hr = TaskDialogIndirect(uTDC, pnButton, pnRadButton, pfVerify)
 #End If
+If hActCtx <> INVALID_HANDLE_VALUE Then
+    DeactivateActCtx 0, lActCtxCookie 'Deactivate, because we don't want to interfere with the rest of the app
+End If
 Dim sErr As String
 'Call GetLastError_Msg(hr, , sErr)
 DebugAppend "TaskDialogIndirect ret=0x" & Hex$(hr) & ": LastErr=0x" & Err.LastDllError
@@ -2794,7 +2879,7 @@ Public Function zzGetButtonElevated(be As Boolean) As Long()
 be = bElv
 zzGetButtonElevated = lBtnElv
 End Function
-Public Sub SetCommonButtonIcon(id As TDBUTTONS, hIcon As LongPtr)
+Public Sub SetCommonButtonIcon(id As TASKDIALOG_COMMON_BUTTON_FLAGS, hIcon As LongPtr)
 Select Case id
     Case TDCBF_OK_BUTTON: icoDataN(0) = hIcon
     Case TDCBF_YES_BUTTON: icoDataN(1) = hIcon
@@ -2840,11 +2925,46 @@ R = RegQueryValueExW(hKey, StrPtr(sKey), 0, REG_SZ, StrPtr(sRes), lDataLen)
 GetRegistryValueW = TrimNullW(sRes)
 R = RegCloseKey(hKey)
 End Function
-    
+
+Private Function IsComCtl6() As Boolean
+Static bHasRun As Boolean
+Static bVal As Boolean
+On Error Resume Next
+If bHasRun = False Then
+    Dim tDVI As DLLVERSIONINFO
+    tDVI.cbSize = LenB(tDVI)
+    Dim hr As Long
+    hr = DllGetVersion(tDVI)
+    DebugAppend "ComCtlDGV hr=0x" & Hex$(hr)
+    If hr = S_OK Then
+        If tDVI.dwMajor >= 6 Then
+            bVal = True
+        End If
+        DebugAppend "ComCtl major=" & tDVI.dwMajor & ",minor=" & tDVI.dwMinor
+    End If
+    bHasRun = True
+End If
+IsComCtl6 = bVal
+On Error GoTo 0
+End Function
+
 Private Sub Class_Initialize()
 #If (Win64 <> 0) And (TWINBASIC = 0) Then
 MagicalTDInitFunction 'VBA64 bug hack
 #End If
+hActCtx = INVALID_HANDLE_VALUE
+If (IsComCtl6 = False) And (useropt_no_force_comctl6 = False) Then
+    hShell32 = LoadLibrary("shell32.dll")
+
+    szSys = Environ$("WINDIR") & "\System32"
+    Dim ctx As ACTCTX
+    ctx.cbSize = LenB(ctx)
+    ctx.dwFlags = ACTCTX_FLAG_RESOURCE_NAME_VALID Or ACTCTX_FLAG_ASSEMBLY_DIRECTORY_VALID Or ACTCTX_FLAG_HMODULE_VALID
+    ctx.hModule = hShell32
+    ctx.lpResourceName = 124
+    ctx.lpAssemblyDirectory = StrPtr(szSys)
+    hActCtx = CreateActCtx(ctx)
+End If
 Dim hDC As LongPtr
 Dim dpi As Long
 hDC = GetDC(0&)
@@ -2859,7 +2979,7 @@ Dim lRet As Long
 nci.cbSize = LenB(nci)
 lRet = SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, LenB(nci), nci, 0)
 If lRet Then
-    nci.lfMessageFont.LFHeight = -((9 * dpi) / 72)
+	nci.lfMessageFont.LFHeight = -((9 * dpi) / 72)
     m_hFontDisp = CreateFontIndirectW(nci.lfMessageFont)
 End If
 If m_hFontDisp = 0 Then m_hFontDisp = GetStockObject(DEFAULT_GUI_FONT) 'fallback
@@ -2867,7 +2987,7 @@ Dim sMinMaxEffect As String
 sMinMaxEffect = GetRegistryValueW(HKEY_CURRENT_USER, "Control Panel\Desktop\WindowMetrics", "MinAnimate")
 If sMinMaxEffect = "1" Then
     mMinMaxEffectEnabled = True
-    nTmrDelay = 5
+	nTmrDelay = 5
 Else
     nTmrDelay = 0
 End If
@@ -2890,7 +3010,6 @@ lSliderChangeL = 2
 nSliderTickStyle = 0
 m_BtnLRSize = 16
 hImageRes = LoadLibrary("imageres.dll")
-hShell32 = LoadLibrary("shell32.dll")
 
 uTDC.cbSize = LenB(uTDC)
 uTDC.hInstance = 0 'App.hInstance
@@ -2908,6 +3027,7 @@ uTDC.pszWindowTitle = StrPtr(m_sTitle)
 End Sub
 
 Private Sub Class_Terminate()
+If hActCtx Then ReleaseActCtx hActCtx
 If hShell32 Then FreeLibrary hShell32
 If hImageRes Then FreeLibrary hImageRes
 DeleteObject m_hFontDisp
@@ -3266,7 +3386,7 @@ Dim i As Long
             Call SendMessageW(hCombo, CBEM_SETIMAGELIST, 0, ByVal himlCombo)
         End If
         For i = 0 To UBound(aComboItems)
-            CBX_InsertItem hCombo, aComboItems(i).sText, aComboItems(i).iImage, aComboItems(i).iOverlay
+            CBX_InsertItem hCombo, aComboItems(i).sText, aComboItems(i).iImage, aComboItems(i).iOverlay, aComboItems(i).lpData
         Next i
         If bCBInitValid Then
             Dim cbxi As COMBOBOXEXITEMW
