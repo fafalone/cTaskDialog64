@@ -1,10 +1,20 @@
-# cTaskDialog64
-### Current Version: v1.4 Universal Compatibility Version
+# cTaskDialog
+### Current Version: v1.5 Universal Compatibility Version
 
 **Quick Start:** Add cTaskDialog.cls and mTDHelper.bas to your project-- these are the only two required files for your code.
 
 
 cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64\
+**Update (v1.5, 15 Jun 2024):**\
+- Class will now attempt to use comctl32.dll 6.0 in the absence of a manifest, since it's impactical to add one to 32bit VBA hosts without one, like Excel. This is activated only immediately prior to the API call and deactivated immediately after, so it won't impact things like Visual Styles outside this class.
+
+- Added lParam options for AddComboItem; obtain from result with ResultComboData.
+
+ - Custom icons were broken in the main demo project (no issue in this class)
+
+ - ComboNewIndex property to provide the last added combo item index.
+
+
 **Update (v1.4, 19 Jan 2024):** Incorrect versions of mTDSample.bas were being used that did have conditonal PtrSafe declares. This has been fixed in the root dir for the VBP, in the Export dir, in the twinproj, and on VBForums.\
 **Update (v1.4, 17 Jan 2024):**\
 After review, I've included the undocumented additional common buttons that were used in the AccessUI version (thanks!). The following .CommonButtons are now available, with their return value given in parentheses:
