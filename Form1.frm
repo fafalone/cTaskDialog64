@@ -613,7 +613,7 @@ Private Enum ShowWindowTypes
 End Enum
 
 #If (VBA7 = 0) Then
-Private Declare Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As Long, ByVal lpOperation As Long, ByVal lpFile As Long, ByVal lpParameters As Long, ByVal lpDirectory As Long, ByVal nShowCmd As ShowWindowTypes) As Long
+Private Declare Function ShellExecuteW Lib "shell32.dll" (ByVal hwnd As Long, ByVal lpOperation As Long, ByVal lpFile As Long, ByVal lpParameters As Long, ByVal lpDirectory As Long, ByVal nShowCmd As ShowWindowTypes) As Long
 Private Declare Function MessageBeep Lib "user32" (ByVal wType As SysBeeps) As Long
 #Else
 Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As LongPtr, ByVal lpOperation As LongPtr, ByVal lpFile As LongPtr, ByVal lpParameters As LongPtr, ByVal lpDirectory As LongPtr, ByVal nShowCmd As ShowWindowTypes) As LongPtr
@@ -641,7 +641,7 @@ With TaskDialog1
     .Title = "cTaskDialog Project"
     .Footer = "Really, think about it."
     .Flags = TDF_USE_COMMAND_LINKS Or TDF_SHOW_PROGRESS_BAR Or TDF_CALLBACK_TIMER
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .AddCustomButton 101, "YeeHaw!" & vbLf & "Put some additional information about the command here."
     .AddCustomButton 102, "NEVER!!!"
     .AddCustomButton 103, "I dunno?"
@@ -715,8 +715,8 @@ End With
 End Sub
 
 Private Sub Command13_Click()
-Dim td As TDBUTTONS
-td = TaskDialog1.SimpleDialog("Is TaskDialogIndirect going to be better than this?", TDCBF_YES_BUTTON, App.Title, "This is regular old TaskDialog", TD_SHIELD_GRAY_ICON, Me.hWnd, App.hInstance)
+Dim td As TASKDIALOG_COMMON_BUTTON_FLAGS
+td = TaskDialog1.SimpleDialog("Is TaskDialogIndirect going to be better than this?", TDCBF_YES_BUTTON, App.Title, "This is regular old TaskDialog", TD_SHIELD_GRAY_ICON, Me.hwnd, App.hInstance)
 Label1.Caption = "ID of button clicked: " & td
 
 End Sub
@@ -737,7 +737,7 @@ With TaskDialog1
     .AddCustomButton 200, "Next Page" & vbLf & "Click here to continue to the next TaskDialog"
     .CommonButtons = TDCBF_YES_BUTTON Or TDCBF_NO_BUTTON
     .IconMain = TD_SHIELD_WARNING_ICON
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .SetButtonHold 200
     .Title = "cTaskDialog Project - Page 1"
     .ShowDialog
@@ -754,7 +754,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label5.Caption = .ResultInput
@@ -805,7 +805,7 @@ With TaskDialog1
     .Title = "cTaskDialog Project"
     .Footer = "$input"
     .IconFooter = TD_INFORMATION_ICON
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label5.Caption = .ResultInput
@@ -833,7 +833,7 @@ With TaskDialogPW
     .IconFooter = TD_INFORMATION_ICON
     .IconMain = TD_SHIELD_ERROR_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label5.Caption = .ResultInput
@@ -857,7 +857,7 @@ With TaskDialog1
     .Title = "cTaskDialog Project"
     .InputText = "Enter Artist name here."
     .VerifyText = "Exclude Jingles"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label5.Caption = .ResultInput
@@ -880,7 +880,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_YES_BUTTON Or TDCBF_CLOSE_BUTTON 'Or TDCBF_CANCEL_BUTTON
     .IconMain = IDI_ERROR
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
 '    .hinst = 0
     .ShowDialog
 
@@ -904,7 +904,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label5.Caption = .ResultInput
@@ -951,7 +951,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label15.Caption = .ResultSlider
@@ -983,7 +983,7 @@ With TaskDialog3
     .ComboAddItem "Item 2", 7
     .ComboAddItem "Item 3", 8
     .VerifyText = "Exclude Jingles"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label3.Caption = "Checked? " & .ResultVerify
@@ -1016,7 +1016,7 @@ With TaskDialog1
     .ComboAddItem "Item 3", 8
 '    .Footer = "Have you been naughty or nice?"
 '    .IconFooter = IDI_QUESTION
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label7.Caption = .ResultComboText
@@ -1054,7 +1054,7 @@ With TaskDialogPW2
     .IconFooter = TD_INFORMATION_ICON
     .IconMain = TD_SHIELD_ERROR_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label5.Caption = .ResultInput
@@ -1092,7 +1092,7 @@ With TaskDialogPW2
     .IconFooter = TD_INFORMATION_ICON
     .IconMain = TD_SHIELD_ERROR_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label5.Caption = .ResultInput
@@ -1114,7 +1114,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label11.Caption = .ResultDateTime
@@ -1136,7 +1136,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label11.Caption = .ResultDateTime
@@ -1162,7 +1162,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label11.Caption = .ResultDateTime
@@ -1208,7 +1208,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label11.Caption = .ResultDateTime
@@ -1244,7 +1244,7 @@ With TaskDialog1
     .IconMain = TD_SHIELD_ICON
     .IconFooter = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
     Label7.Caption = .ResultComboText
     Label9.Caption = .ResultComboIndex
@@ -1345,7 +1345,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label11.Caption = .ResultDateTime
@@ -1368,7 +1368,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label11.Caption = .ResultDateTime
@@ -1403,7 +1403,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label15.Caption = .ResultSlider
@@ -1437,7 +1437,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON 'Or TDCBF_RETRY_BUTTON Or TDCBF_CLOSE_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label5.Caption = .ResultInput
@@ -1477,7 +1477,7 @@ With TaskDialog3
     .ExpandedInfo = "Expanded information."
     .VerifyText = "Verification check."
     .IconFooter = TD_ERROR_ICON
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label7.Caption = .ResultComboText
@@ -1511,7 +1511,7 @@ With TaskDialog1
     .IconMain = TD_INFORMATION_ICON
     .IconFooter = TD_ERROR_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label11.Caption = .ResultDateTime
@@ -1542,7 +1542,7 @@ With TaskDialog1
     .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
     .IconMain = TD_INFORMATION_ICON
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label15.Caption = .ResultSlider
@@ -1582,7 +1582,7 @@ With TaskDialogSC
 '    .CommonButtons = TDCBF_NO_BUTTON
     .Title = "TestTitle"
     .Content = "TestContent"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .MainInstruction = "TestInstruction"
     .IconMain = TD_INFORMATION_ICON
 '    .AddCustomButton 122, "Button 1"
@@ -1651,7 +1651,7 @@ With TaskDialog1
 '    .Footer = "<A HREF=""www.microsoft.com"">Microsoft</A> on the web" & _
 '                                                  " - <A HREF=""http://msdn.microsoft.com/"">MSDN</A> on the web"
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .SetLogoImage hBmp, LogoBitmap, LogoTopRight, 4, 4 'LogoButtons
     bRunMarquee = True
     .ShowDialog
@@ -1720,7 +1720,7 @@ With TaskDialog1
 '    .Footer = "<A HREF=""www.microsoft.com"">Microsoft</A> on the web" & _
 '                                                  " - <A HREF=""http://msdn.microsoft.com/"">MSDN</A> on the web"
     .Title = "cTaskDialog Project"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .SetLogoImage hBmp, LogoBitmap, LogoButtons
     bRunMarquee = True
     .ShowDialog
@@ -1778,7 +1778,7 @@ With TaskDialogMPX2
     .IconFooter = TD_INFORMATION_ICON
     .IconMain = TD_SHIELD_GRAY_ICON
     .Title = "cTaskDialog Project - Page 2"
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
 End With
 With TaskDialogMPX1
     .Init
@@ -1790,7 +1790,7 @@ With TaskDialogMPX1
     .AddCustomButton 201, "Set log in information" & vbLf & "Select your username."
     .CommonButtons = TDCBF_CANCEL_BUTTON
     .IconMain = TD_SHIELD_ICON
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .SetButtonHold 200
     .SetButtonHold 201
     .Title = "cTaskDialog Project - Page 1"
@@ -1817,7 +1817,7 @@ With TaskDialogAC
     .Footer = "Closing in 15 seconds..."
     .Title = "cTaskDialog Project"
     .AutocloseTime = 15 'seconds
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
 '    .hinst = 0
     .ShowDialog
 
@@ -1863,7 +1863,7 @@ With TaskDialog1
     .Title = "cTaskDialog Project"
     .CommonButtons = TDCBF_CLOSE_BUTTON
     .Flags = TDF_ENABLE_HYPERLINKS
-    .ParenthWnd = Me.hWnd
+    .ParenthWnd = Me.hwnd
     .ShowDialog
 
     Label1.Caption = "ID of button clicked: " & .ResultMain
@@ -1984,7 +1984,7 @@ Set TaskDialogMPX1 = New cTaskDialog
 Set TaskDialogMPX2 = New cTaskDialog
 End Sub
 
-Private Sub TaskDialog1_DialogCreated(ByVal hWnd As LongPtr)
+Private Sub TaskDialog1_DialogCreated(ByVal hwnd As LongPtr)
 If bRunProgress Then
     Timer1.Enabled = True
     TaskDialog1.ProgressSetRange 0, 60
@@ -2038,12 +2038,12 @@ Debug.Print "TaskDialog2_ButtonClick " & ButtonID
 
 End Sub
 
-Private Sub TaskDialog2_DialogConstucted(ByVal hWnd As LongPtr)
+Private Sub TaskDialog2_DialogConstucted(ByVal hwnd As LongPtr)
 Debug.Print "TaskDialog2_DialogConstucted"
 
 End Sub
 
-Private Sub TaskDialog2_DialogCreated(ByVal hWnd As LongPtr)
+Private Sub TaskDialog2_DialogCreated(ByVal hwnd As LongPtr)
 Debug.Print "TaskDialog2_DialogCreated"
 If bRunMarquee2 Then
     TaskDialog1.ProgressStartMarquee
@@ -2051,7 +2051,7 @@ End If
 
 End Sub
 
-Private Sub TaskDialog2_DropdownButtonClicked(ByVal hWnd As LongPtr)
+Private Sub TaskDialog2_DropdownButtonClicked(ByVal hwnd As LongPtr)
 Debug.Print "TD2 ButtonDropdown"
 End Sub
 
@@ -2059,7 +2059,7 @@ Private Sub TaskDialog2_InputBoxChange(sText As String)
 Debug.Print "TD2 Input=" & sText
 End Sub
 
-Private Sub TaskDialog3_DialogCreated(ByVal hWnd As LongPtr)
+Private Sub TaskDialog3_DialogCreated(ByVal hwnd As LongPtr)
 'Call SendMessageW(TaskDialog3.hWndCombo, CB_SETDROPPEDWIDTH, 900&, ByVal 0&)
 End Sub
 
@@ -2068,7 +2068,7 @@ Debug.Print "InputChange=" & sText
 
 End Sub
 
-Private Sub TaskDialogAC_DialogCreated(ByVal hWnd As LongPtr)
+Private Sub TaskDialogAC_DialogCreated(ByVal hwnd As LongPtr)
 TaskDialogAC.ProgressSetRange 0, 15
 TaskDialogAC.ProgressSetState ePBST_ERROR
 End Sub
@@ -2127,7 +2127,7 @@ If bPageExampleEx Then
                 .AddCustomButton 201, "Set log in information" & vbLf & "Select your username."
                 .CommonButtons = TDCBF_CANCEL_BUTTON
                 .IconMain = TD_SHIELD_ICON
-                .ParenthWnd = Me.hWnd
+                .ParenthWnd = Me.hwnd
                 .SetButtonHold 200
                 .SetButtonHold 201
                 .Title = "cTaskDialog Project - Page 1"
@@ -2176,7 +2176,7 @@ If ButtonID = TD_OK Then
 End If
 End Sub
 
-Private Sub TaskDialogSC_DropdownButtonClicked(ByVal hWnd As LongPtr)
+Private Sub TaskDialogSC_DropdownButtonClicked(ByVal hwnd As LongPtr)
 Debug.Print "Got DropDown Button!"
 End Sub
 

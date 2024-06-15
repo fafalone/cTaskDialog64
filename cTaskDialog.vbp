@@ -1,10 +1,10 @@
 Type=Exe
-Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Class=cTaskDialog; cTaskDialog.cls
 Module=mTDSample; mTDSample.bas
 Form=Form1.frm
-ResFile32="td.res"
 Module=mTDHelper; mTDHelper.bas
+ResFile32="td.res"
 IconForm="Form1"
 Startup="Form1"
 HelpFile=""
