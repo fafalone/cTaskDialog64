@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.5 Universal Compatibility Version
+'cTaskDialog v1.5 R2 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
@@ -23,7 +23,7 @@ Option Explicit
 'https://www.vbforums.com/showthread.php?777021
 '
 'Originally Released 21 March 2020
-'x64 Version released 21 October 2022; update 15 Jun 2024
+'x64 Version released 21 October 2022; update 27 Mar 2025
 '************************************************************
 '
 '
@@ -56,9 +56,17 @@ Option Explicit
 '
 '*************************************************
 'VERSION HISTORY
+'Version 1.5.2 (1.5 R2) 
+'-Changed missed Debug.Print statements to DebugAppend and set useropt_dbg_PrintToImmediate
+'   to False by default, so the class will no longer print debug messages unless changed.
+'-Helper module has been condensed back to the original compact form; it was only expanded
+'   while trying to find a VBA bug workaround now solved by MagicalTDInitFunction.
+'-Bug fix: zzGetCommonButtonIcon and ResultComboData Long instead of LongPtr.
+'-Corrected misc spelling mistakes highlighted by the AccessUI version :)
+'
 'Version 1.5.0
 ' - Class will now attempt to use comctl32.dll 6.0 in the absence of a manifest, since
-'   it's impactical to add one to 32bit VBA hosts without one, like Excel.
+'   it's impractical to add one to 32bit VBA hosts without one, like Excel.
 '   This is activated only immediately prior to the API call and deactivated immediately
 '   after, so it won't impact things like Visual Styles outside this class.
 '
@@ -97,7 +105,7 @@ Option Explicit
 '   Call an unused dummy sub in the module from Class_Initialize before doing anything else.
 '
 'Version 1.2.6 Universal 
-'Bug fix: SimpleDialog return TDBUTTONS insted of TDRESULT
+'Bug fix: SimpleDialog return TDBUTTONS instead of TDRESULT
 '
 '
 'Version 1.2.5 Universal
@@ -108,7 +116,7 @@ Option Explicit
 'Bug fix: VBA calls in ShowDialog/NavigatePage incorrectly pointed to array instead of 1st item.
 '
 'Version 1.2.3 Universal
-'Bug fix: Resolved incorrect positioning on some systems. This occured when system visual effects
+'Bug fix: Resolved incorrect positioning on some systems. This occurred when system visual effects
 '         for window min/max were disabled, preventing getting the previous size after being 
 '         notified of the expando click.
 '
@@ -146,7 +154,7 @@ Option Explicit
 '    back to an earlier page, you'll need to reset the settings first. All of them, not just
 '    customizations.
 '--Added InputBoxTextAlign property to set left/right/center alignment.
-'--Added User Options section below this changelong that includes a boolean for whether to print
+'--Added User Options section below this changelog that includes a boolean for whether to print
 '  debug messages in the immediate window, and whether to include the date/time if it does. Also
 '  added an option for the minimum level of message to show, but so far no debug messages in the
 '  project are set to a different level.
@@ -166,7 +174,7 @@ Option Explicit
 '--The cTaskDialog class is now entirely self-contained- using Paul Caton/LaVolpe's self-sub
 '  self-callback routines to eliminate the need for a module or presence of the TaskDialog__Procs.
 '--Additional left-right-center alignment for custom controls has been added. For the additions,
-'  they are only relevent if the control is being used with a fixed width. Given this, automatic
+'  they are only relevant if the control is being used with a fixed width. Given this, automatic
 '  prevention of only allowing 1 control per location has been disabled-- however, it is the on
 '  the caller to ensure there's no overlap.
 '--To further aid in this, you can now specify a manual offset with .(control)OffsetX that is
@@ -234,7 +242,7 @@ Option Explicit
 '               position. Height available is too small no matter how it's positioned.
 '----------------------------------------------------------------------------------------------------
 'NEW IN VERSION 0.8
-'--Added ability to use comboxes (normal edit dropdown and dropdown list), date/time pickers,
+'--Added ability to use comboboxes (normal edit dropdown and dropdown list), date/time pickers,
 '  and sliders like the inputbox controls.
 '--There's still the 3 alignment positions from the inputbox, so you can have controls in each
 '  of these places (however, only 1 of each type is allowed)
@@ -310,7 +318,7 @@ Option Explicit
 
 '*******************************************************************************
 'USER OPTIONS : Configuration for developers using this class.
-Private Const useropt_dbg_PrintToImmediate As Boolean = True
+Private Const useropt_dbg_PrintToImmediate As Boolean = False
 Private Const useropt_dbg_MinLevel As Long = 0&
 Private Const useropt_dbg_IncludeDateTime As Boolean = True
 Private Const useropt_no_force_comctl6 As Boolean = False 'Don't use activation context API
@@ -322,6 +330,7 @@ Private Const WM_USER = &H400&
 Private Const S_OK = 0
 Private Const S_FALSE = 1&
 Private Const CSIDL_SYSTEM = &H25
+Public Const MAX_PATH As Long = 260
 Private Const IDD_EDIT1 = 101&
 Private Const IDD_DT1 = 102&
 Private Const IDD_DT2 = 103&
@@ -627,21 +636,20 @@ End Type
 Private Const INVALID_HANDLE_VALUE = -1&
 
 Public Enum TDICONS
-    TD_WARNING_ICON = -1 'exclamation point in a yellow 'yield' triangle (same image as IDI_EXCLAMATION)
-    TD_ERROR_ICON = -2 'round red circle containg 'X' (same as IDI_HAND)
-    TD_INFORMATION_ICON = -3 'round blue circle containing 'i' (same image as IDI_ASTERISK)
-    TD_SHIELD_ICON = -4 'Vista's security shield
+    TD_WARNING_ICON = -1          'exclamation point in a yellow 'yield' triangle (same image as IDI_EXCLAMATION)
+    TD_ERROR_ICON = -2            'round red circle containg 'X' (same as IDI_HAND)
+    TD_INFORMATION_ICON = -3      'round blue circle containing 'i' (same image as IDI_ASTERISK)
+    TD_SHIELD_ICON = -4           'Vista's security shield
     IDI_APPLICATION = 32512&
-    IDI_ERROR = 32513&
-    'miniature picture of an application window
-    IDI_QUESTION = 32514& 'round blue circle containing '?'
+    IDI_ERROR = 32513&            'miniature picture of an application window
+    IDI_QUESTION = 32514&         'round blue circle containing '?'
     IDI_WINLOGO = 32517&
-    TD_SHIELD_GRADIENT_ICON = -5 'same image as TD_SHIELD_ICON; main message text on gradient blue background
-    TD_SHIELD_WARNING_ICON = -6 'exclamation point in yellow Shield shape; main message text on gradient orange background
-    TD_SHIELD_ERROR_ICON = -7 'X contained within Shield shape; main message text on gradient red background
-    TD_SHIELD_OK_ICON = -8 'Shield shape containing green checkmark; main message text on gradient green background
-    TD_SHIELD_GRAY_ICON = -9 'same image as TD_SHIELD_ICON; main message text on medium gray background
-    TD_NO_ICON = 0 'no icon; text on white background
+    TD_SHIELD_GRADIENT_ICON = -5  'same image as TD_SHIELD_ICON; main message text on gradient blue background
+    TD_SHIELD_WARNING_ICON = -6   'exclamation point in yellow Shield shape; main message text on gradient orange background
+    TD_SHIELD_ERROR_ICON = -7     'X contained within Shield shape; main message text on gradient red background
+    TD_SHIELD_OK_ICON = -8        'Shield shape containing green checkmark; main message text on gradient green background
+    TD_SHIELD_GRAY_ICON = -9      'same image as TD_SHIELD_ICON; main message text on medium gray background
+    TD_NO_ICON = 0                'no icon; text on white background
 End Enum
 
 'taskdialog common button flags
@@ -697,15 +705,15 @@ Public Enum TASKDIALOG_FLAGS
     TDF_CAN_BE_MINIMIZED = &H8000&
     TDF_NO_SET_FOREGROUND = &H10000
     TDF_SIZE_TO_CONTENT = &H1000000
-    TDF_USE_SHELL32_ICONID = &H400000 'CUSTOM FLAG
-    TDF_USE_IMAGERES_ICONID = &H800000 'CUSTOM FLAG
-    TDF_DATETIME = &H80000         'CUSTOM FLAG: Add calendar control
-    TDF_SLIDER = &H2000000            'CUSTOM FLAG: Add Slider control
-    TDF_INPUT_BOX = &H4000000        'CUSTOM FLAG: Input box. See below.
-    TDF_COMBO_BOX = &H8000000               'CUSTOM FLAG: Combo box; .ComboType controls edit or list
-    TDF_KILL_SHIELD_ICON = &H10000000 'CUSTOM FLAG: Allows the colored background from the TD_SHIELD_x icons to be used with just the text and no shield icon
-    TDF_EXEC_HYPERLINKS = &H20000000           'CUSTOM FLAG
-    TDF_USE_SHELL32_ICONID_BUTTON = &H40000000 'CUSTOM FLAG
+    TDF_USE_SHELL32_ICONID = &H400000           'CUSTOM FLAG
+    TDF_USE_IMAGERES_ICONID = &H800000          'CUSTOM FLAG
+    TDF_DATETIME = &H80000                      'CUSTOM FLAG: Add calendar control
+    TDF_SLIDER = &H2000000                      'CUSTOM FLAG: Add Slider control
+    TDF_INPUT_BOX = &H4000000                   'CUSTOM FLAG: Input box. See below.
+    TDF_COMBO_BOX = &H8000000                   'CUSTOM FLAG: Combo box; .ComboType controls edit or list
+    TDF_KILL_SHIELD_ICON = &H10000000           'CUSTOM FLAG: Allows the colored background from the TD_SHIELD_x icons to be used with just the text and no shield icon
+    TDF_EXEC_HYPERLINKS = &H20000000            'CUSTOM FLAG
+    TDF_USE_SHELL32_ICONID_BUTTON = &H40000000  'CUSTOM FLAG
     TDF_USE_IMAGERES_ICONID_BUTTON = &H80000000 'CUSTOM FLAG
 End Enum
 'TDF_INPUT_BOX:
@@ -883,6 +891,7 @@ Private Declare PtrSafe Function CreateActCtx Lib "kernel32" Alias "CreateActCtx
 Private Declare PtrSafe Function ActivateActCtx Lib "kernel32" (ByVal hActCtx As LongPtr, lpCookie As LongPtr) As Long
 Private Declare PtrSafe Function DeactivateActCtx Lib "kernel32" (ByVal dwFlags As DeactivateActCtxFlags, ByVal lpCookie As LongPtr) As Long
 Private Declare PtrSafe Sub ReleaseActCtx Lib "kernel32" (ByVal hActCtx As LongPtr)
+Private Declare PtrSafe Function GetSystemDirectoryW Lib "kernel32" (ByVal lpBuffer As LongPtr, ByVal uSize As Long) As Long
                                                                                                                                                                                      
 #Else
 Private Declare Function TaskDialog Lib "comctl32.dll" _
@@ -951,6 +960,7 @@ Private Declare Function CreateActCtx Lib "kernel32" Alias "CreateActCtxW" (pAct
 Private Declare Function ActivateActCtx Lib "kernel32" (ByVal hActCtx As Long, lpCookie As Long) As Long
 Private Declare Function DeactivateActCtx Lib "kernel32" (ByVal dwFlags As DeactivateActCtxFlags, ByVal lpCookie As Long) As Long
 Private Declare Sub ReleaseActCtx Lib "kernel32" (ByVal hActCtx As Long)
+Private Declare Function GetSystemDirectoryW Lib "kernel32" (ByVal lpBuffer As Long, ByVal uSize As Long) As Long
 
 #End If
 
@@ -1475,6 +1485,7 @@ Select Case uNotification
             Else
                 bDTCheck = False
             End If
+            DebugAppend "TD_DESTROYED tDTCur=" & TimeSerial(tDTCur.wHour, tDTCur.wMinute, tDTCur.wSecond)
         End If
         If hDateTime2 Then
             rs = CLng(SendMessageW(hDateTime2, DTM_GETSYSTEMTIME, 0&, tDTCur2))
@@ -1483,6 +1494,7 @@ Select Case uNotification
             Else
                 bDTCheck2 = False
             End If
+            DebugAppend "TD_DESTROYED tDTCur=" & TimeSerial(tDTCur2.wHour, tDTCur2.wMinute, tDTCur2.wSecond)
         End If
         If hSlider Then
             lSliderValue = CLng(SendMessageW(hSlider, TBM_GETPOS, 0, ByVal 0&))
@@ -1510,7 +1522,7 @@ Private Function GetStrFromBufferA(sz As String) As String
 End Function
 
 
-Private Sub DebugAppend(sMsg As String, Optional iLvl As Long)
+Private Sub DebugAppend(ByVal sMsg As String, Optional iLvl As Long)
 If useropt_dbg_PrintToImmediate = False Then Exit Sub
 If useropt_dbg_IncludeDateTime Then sMsg = "[" & Format$(Now, "yyyy-mm-dd Hh:nn:Ss") & "] " & sMsg
 If iLvl >= useropt_dbg_MinLevel Then Debug.Print sMsg
@@ -1533,8 +1545,8 @@ Public Property Get DPIScaleY() As Single: DPIScaleY = m_ScaleY: End Property
 Public Property Let AutocloseTime(Value As Long): lAutocloseTrack = Value: End Property
 Public Property Get AutocloseTime() As Long: AutocloseTime = lAutocloseTrack: End Property
 
-Public Property Let hinst(hInstance As LongPtr): uTDC.hInstance = hInstance: End Property
-Public Property Get hinst() As LongPtr: hinst = uTDC.hInstance: End Property
+Public Property Let hInst(hInstance As LongPtr): uTDC.hInstance = hInstance: End Property
+Public Property Get hInst() As LongPtr: hInst = uTDC.hInstance: End Property
 
 Public Property Get Flags() As TASKDIALOG_FLAGS: Flags = uTDC.dwFlags: End Property
 Public Property Let Flags(dwFlags As TASKDIALOG_FLAGS): uTDC.dwFlags = dwFlags: End Property
@@ -2115,7 +2127,7 @@ Public Property Get ResultVerify() As Long: ResultVerify = m_ResVerify: End Prop
 Public Property Get ResultInput() As String: ResultInput = sEditText: End Property
 Public Property Get ResultComboText() As String: ResultComboText = sComboText: End Property
 Public Property Get ResultComboIndex() As Long: ResultComboIndex = nComboIdx: End Property
-Public Property Get ResultComboData() As Long: ResultComboData = aComboItems(nComboIdx).lpData: End Property
+Public Property Get ResultComboData() As LongPtr: ResultComboData = aComboItems(nComboIdx).lpData: End Property
 Public Property Get ResultSlider() As Long: ResultSlider = lSliderValue: End Property
 Public Property Get ResultDateTime() As Date
     If (nDTType = dttDate) Or (nDTType = dttDateWithCheck) Then
@@ -2234,11 +2246,11 @@ End If
 Call SendMessageW(hCombo, CBEM_SETITEMW, 0, cbxi)
 
 End Sub
-Public Function SimpleDialog(sMessage As String, Optional dwBtn As TASKDIALOG_COMMON_BUTTON_FLAGS = TDCBF_OK_BUTTON, Optional sTitle As String, Optional sMainText As String, Optional dwIco As TDICONS, Optional hWndOwner As LongPtr, Optional hinst As LongPtr) As TDRESULT
-   Dim dwIcon As Long
-   Dim pnButton As Long
-   Dim Success As Long
-    
+Public Function SimpleDialog(sMessage As String, Optional dwBtn As TASKDIALOG_COMMON_BUTTON_FLAGS = TDCBF_OK_BUTTON, Optional sTitle As String, Optional sMainText As String, Optional dwIco As TDICONS, Optional hWndOwner As LongPtr, Optional hInst As LongPtr) As TDRESULT
+Dim dwIcon As Long
+Dim pnButton As Long
+Dim Success As Long
+
 Dim pszTitle As LongPtr
 Dim pszMain As LongPtr
 Dim pszContent As LongPtr
@@ -2262,7 +2274,7 @@ If hActCtx <> INVALID_HANDLE_VALUE Then 'we need to activate comctl32.dll 6.0
     ActivateActCtx hActCtx, lActCtxCookie
 End If
   Call TaskDialog(hWndOwner, _
-                        hinst, _
+                        hInst, _
                         pszTitle, _
                         pszMain, _
                         pszContent, _
@@ -2889,7 +2901,7 @@ Select Case id
     Case TDCBF_CLOSE_BUTTON: icoDataN(5) = hIcon
 End Select
 End Sub
-Public Function zzGetCommonButtonIcon() As Long()
+Public Function zzGetCommonButtonIcon() As LongPtr()
 zzGetCommonButtonIcon = icoDataN
 End Function
 Private Function tdMakeIntResource(ByVal dwVal As Long) As Long
@@ -2956,7 +2968,14 @@ hActCtx = INVALID_HANDLE_VALUE
 If (IsComCtl6 = False) And (useropt_no_force_comctl6 = False) Then
     hShell32 = LoadLibrary("shell32.dll")
 
-    szSys = Environ$("WINDIR") & "\System32"
+    szSys = String$(MAX_PATH, 0)
+    Dim cch As Long
+    cch = GetSystemDirectoryW(StrPtr(szSys), MAX_PATH)
+    If cch Then
+        szSys = Left$(szSys, cch)
+    Else
+        szSys = Environ$("WINDIR") & "\System32"
+    End If
     Dim ctx As ACTCTX
     ctx.cbSize = LenB(ctx)
     ctx.dwFlags = ACTCTX_FLAG_RESOURCE_NAME_VALID Or ACTCTX_FLAG_ASSEMBLY_DIRECTORY_VALID Or ACTCTX_FLAG_HMODULE_VALID
@@ -2972,6 +2991,7 @@ dpi = GetDeviceCaps(hDC, LOGPIXELSY)
 m_ScaleX = GetDeviceCaps(hDC, LOGPIXELSX) / 96
 m_ScaleY = dpi / 96
 ReleaseDC 0&, hDC
+DebugAppend m_ScaleY
 Dim nci As NONCLIENTMETRICSW
 Dim tLF As LOGFONTW
 Dim lRet As Long
@@ -3110,7 +3130,7 @@ With uTDC2
     .CXWidth = cTD.Width
     .dwCommonButtons = cTD.CommonButtons
     .dwFlags = cTD.Flags
-    .hInstance = cTD.hinst
+    .hInstance = cTD.hInst
     .hWndParent = cTD.ParenthWnd
     .nDefaultButton = cTD.DefaultButton
     .nDefaultRadioButton = cTD.DefaultRadioButton

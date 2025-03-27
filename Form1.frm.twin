@@ -1,5 +1,5 @@
-[ FormDesignerId ("6F7672BF-AA57-4571-B865-DDF762FD2B4C") ]
-[ PredeclaredId ]
+[FormDesignerId("6F7672BF-AA57-4571-B865-DDF762FD2B4C")]
+[PredeclaredId]
 Class Form1
     Attribute VB_Name = "Form1"
     Attribute VB_GlobalNameSpace = False
@@ -7,6 +7,7 @@ Class Form1
     Attribute VB_PredeclaredId = True
     Attribute VB_Exposed = False
     Option Explicit
+    
     
     'cTaskDialog Samples
     'Written by fafalone
@@ -107,8 +108,8 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .MainInstruction = "Show me the icons!"
         .Content = "Yeah, that's the stuff."
         .Footer = "Got some footer icon action here too."
-        .Flags = TDF_USE_SHELL32_ICONID
-        .IconMain = 18
+        .Flags = TDF_USE_IMAGERES_ICONID
+        .IconMain = 1401
         .IconFooter = 35
         .Title = "cTaskDialog Project"
         .CommonButtons = TDCBF_CLOSE_BUTTON
@@ -160,7 +161,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     End Sub
     
     Private Sub Command13_Click()
-    Dim td As TDBUTTONS
+    Dim td As TASKDIALOG_COMMON_BUTTON_FLAGS
     td = TaskDialog1.SimpleDialog("Is TaskDialogIndirect going to be better than this?", TDCBF_YES_BUTTON, App.Title, "This is regular old TaskDialog", TD_SHIELD_GRAY_ICON, Me.hWnd, App.hInstance)
     Label1.Caption = "ID of button clicked: " & td
     
@@ -217,9 +218,11 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     
     Private Sub Command16_Click()
     Dim hIcon1 As LongPtr, hIcon2 As LongPtr
-    hIcon1 = ResIconToHICON("ICO_CLOCK", 16, 16)
-    'hIcon2 = ResIconToHICON("ICO_HEART", 32, 32)
-    hIcon2 = ResIconToHICON("ICO_HEART", 16, 16)
+    ' hIcon1 = ResIconToHICON("ICO_CLOCK", 32, 32)
+    ' 'hIcon2 = ResIconToHICON("ICO_HEART", 32, 32)
+    ' hIcon2 = ResIconToHICON("ICO_HEART", 32, 32)
+    hIcon1 = LoadImageA(0, App.Path & "\ICO_CLOCK.ico", IMAGE_ICON, 32, 32, LR_LOADFROMFILE)
+    hIcon2 = LoadImageA(0, App.Path & "\ICO_HEART.ico", IMAGE_ICON, 32, 32, LR_LOADFROMFILE)
     With TaskDialog1
         .Init
         .MainInstruction = "Look at the pretty icons."
@@ -323,15 +326,15 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     Private Sub Command2_Click()
     Set TaskDialog1 = New cTaskDialog
     With TaskDialog1
-        .Content = "Message text"
+    	.Content = "Message text"
         .CommonButtons = TDCBF_ABORT_BUTTON Or TDCBF_IGNORE_BUTTON Or TDCBF_TRYAGAIN_BUTTON Or TDCBF_CONTINUE_BUTTON Or TDCBF_HELP_BUTTON
-        .Flags = TDF_POSITION_RELATIVE_TO_WINDOW
-        .ParenthWnd = Me.hWnd
+        .Flags = TDF_POSITION_RELATIVE_TO_WINDOW Or TDF_CAN_BE_MINIMIZED Or TDF_ALLOW_DIALOG_CANCELLATION
+        '.ParenthWnd = Me.hWnd
         .ShowDialog
         'If .ResultMain = TD_OK Then
-            Debug.Print "You clicked " & .ResultMain
+        	Debug.Print "You clicked " & .ResultMain
         'Else
-       '     Debug.Print "Canceled."
+       ' 	Debug.Print "Canceled."
         'End If
     End With
     ' With TaskDialog1
@@ -356,12 +359,11 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     '     End If
     ' End With
     End Sub
-    
-    Private Sub TaskDialog1_Help() Handles TaskDialog1.Help
-        Debug.Print "help event fired"
+    Private Sub TaskDialog1_DialogCreated(ByVal hWnd As LongPtr)
+    If bRunMarquee Then
+        TaskDialog1.ProgressStartMarquee()
+    End If
     End Sub
-    
-    
     Private Sub Command20_Click()
     With TaskDialog1
         .Init
@@ -1081,7 +1083,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         If TaskDialog1.DPIScaleX > 1 Then
             sImg = App.Path & "\disc48.png"
         Else
-            sImg = App.Path & "\disc32.png"
+        	sImg = App.Path & "\disc32.png"
         End If
         hBmp = hBitmapFromFile(sImg, CX, CY)
     '    hBmp = LoadImageW(0, StrPtr(simg), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE)
@@ -1455,16 +1457,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     Set TaskDialogMPX2 = New cTaskDialog
     End Sub
     
-    Private Sub TaskDialog1_DialogCreated(ByVal hWnd As LongPtr)
-    If bRunProgress Then
-        Timer1.Enabled = True
-        TaskDialog1.ProgressSetRange 0, 60
-    End If
-    If bRunMarquee Then
-        TaskDialog1.ProgressStartMarquee
-    End If
-    
-    End Sub
+
     
     
     Private Sub TaskDialog1_InputBoxChange(sText As String)
@@ -1676,6 +1669,6 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         TaskDialog2.ProgressStartMarquee
     End If
     End Sub
-    
+
 
 End Class
