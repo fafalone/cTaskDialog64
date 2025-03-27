@@ -2972,7 +2972,6 @@ dpi = GetDeviceCaps(hDC, LOGPIXELSY)
 m_ScaleX = GetDeviceCaps(hDC, LOGPIXELSX) / 96
 m_ScaleY = dpi / 96
 ReleaseDC 0&, hDC
-Debug.Print m_ScaleY
 Dim nci As NONCLIENTMETRICSW
 Dim tLF As LOGFONTW
 Dim lRet As Long
