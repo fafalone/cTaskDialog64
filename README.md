@@ -1,10 +1,14 @@
 # cTaskDialog
-### Current Version: v1.5 Universal Compatibility Version
+### Current Version: v1.5 R2 Universal Compatibility Version
 
 **Quick Start:** Add cTaskDialog.cls and mTDHelper.bas to your project-- these are the only two required files for your code.
 
 
 cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64\
+**Update (v1.5.2 (1.5 R2), 27 Mar 2025):**\
+-Changed missed Debug.Print statements to DebugAppend and set useropt_dbg_PrintToImmediate to False by default, so the class will no longer print debug messages unless changed.\
+-Bug fix: zzGetCommonButtonIcon and ResultComboData Long instead of LongPtr.
+-Corrected misc spelling mistakes highlighted by the AccessUI version :)
 **Update (v1.5, 19 Mar 2025):** mTDHelper.bas has been restored to its earlier compact form; change was during troubleshooting and unnecessary. No change to class.\
 **Update (v1.5, 15 Jun 2024):**
 - Class will now attempt to use comctl32.dll 6.0 in the absence of a manifest, since it's impactical to add one to 32bit VBA hosts without one, like Excel. This is activated only immediately prior to the API call and deactivated immediately after, so it won't impact things like Visual Styles outside this class.
