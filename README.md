@@ -4,7 +4,11 @@
 **Quick Start:** Add cTaskDialog.cls and mTDHelper.bas to your project-- these are the only two required files for your code.
 
 
-cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64\
+cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64
+
+**Update (v1.5.3 (1.5 R3), 03 Jun 2025):**\
+-Bug fix: Public const in class.
+
 **Update (v1.5.2 (1.5 R2), 27 Mar 2025):**\
 -Changed missed Debug.Print statements to DebugAppend and set useropt_dbg_PrintToImmediate to False by default, so the class will no longer print debug messages unless changed.\
 -Bug fix: zzGetCommonButtonIcon and ResultComboData Long instead of LongPtr.\
