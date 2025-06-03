@@ -43,19 +43,20 @@
 	"project.settingsVersion": 1,
 	"project.startupObject": "Form1",
 	"project.versionAutoIncrement": "Revision",
-	"project.versionBuild": 0,
+	"project.versionBuild": 3,
 	"project.versionCompanyName": "Fafalonian Productions",
-	"project.versionFileDescription": "cTaskDialogDemo",
+	"project.versionFileDescription": "cTaskDialog Demo App",
 	"project.versionLegalCopyright": "©2014 -2022",
 	"project.versionMajor": 1,
 	"project.versionMinor": 5,
 	"project.versionProductName": "cTaskDialog Sample Project",
-	"project.versionRevision": 27,
+	"project.versionRevision": 30,
 	"project.warnings": {
 		"errors": [],
 		"hints": [],
 		"ignored": [],
-		"info": []
+		"info": [],
+		"warnings": []
 	},
 	"runtime.useUnicodeStandardLibrary": true
 }
