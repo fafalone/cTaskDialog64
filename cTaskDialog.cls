@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.5 R2 Universal Compatibility Version
+'cTaskDialog v1.5 R3 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
@@ -23,7 +23,7 @@ Option Explicit
 'https://www.vbforums.com/showthread.php?777021
 '
 'Originally Released 21 March 2020
-'x64 Version released 21 October 2022; update 27 Mar 2025
+'x64 Version released 21 October 2022; update 03 Jun 2025
 '************************************************************
 '
 '
@@ -56,6 +56,10 @@ Option Explicit
 '
 '*************************************************
 'VERSION HISTORY
+'
+'Version 1.5.3 (1.5 R3)
+'-Bug fix: Public const in class.
+'
 'Version 1.5.2 (1.5 R2) 
 '-Changed missed Debug.Print statements to DebugAppend and set useropt_dbg_PrintToImmediate
 '   to False by default, so the class will no longer print debug messages unless changed.
