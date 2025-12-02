@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.5 R3 Universal Compatibility Version
+'cTaskDialog v1.6 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
@@ -22,8 +22,7 @@ Option Explicit
 '
 'https://www.vbforums.com/showthread.php?777021
 '
-'Originally Released 21 March 2020
-'x64 Version released 21 October 2022; update 03 Jun 2025
+'Released 02 December 2025
 '************************************************************
 '
 '
@@ -57,6 +56,15 @@ Option Explicit
 '*************************************************
 'VERSION HISTORY
 '
+'Version 1.6.0
+'-Add property InputPasswordChar to set a custom password char.
+'  Set as a Unicode AscW value (Integer). The black dot is the default.
+'-Common button icons now supported for Abort, Ignore, Try Again, and Continue.
+'-Bug fix: Custom button icons off by one if radio buttons present
+'-Bug fix: Shell32 Icon IDs could fail without explicitly loading shell32.dll. 
+'-Demos: twinBASIC Password demo updated to show use of the VerifyText checkbox to 
+'    toggle whether the password is visible by using .InputPasswordChar
+
 'Version 1.5.3 (1.5 R3)
 '-Bug fix: Public const in class.
 '
@@ -363,6 +371,7 @@ Private Const BM_SETIMAGE = &HF7
 Private Const EM_SETSEL As Long = &HB1
 Private Const ECM_FIRST As Long = &H1500
 Private Const EM_SETCUEBANNER As Long = (ECM_FIRST + 1)
+Private Const EM_SETPASSWORDCHAR As Long = &HCC
 Private Const ES_LEFT = &H0
 Private Const ES_CENTER = &H1
 Private Const ES_RIGHT = &H2
@@ -1027,7 +1036,7 @@ Private bRadDis As Boolean
 Private btnCaps() As String 'weird things happen if these are set but not stored
 Private rbtnCaps() As String
 Private icoDataC() As LongPtr 'icon data for custom buttons
-Private icoDataN(5) As LongPtr 'icon data for normal buttons
+Private icoDataN(9) As LongPtr 'icon data for normal buttons
 Private bAutoclose As Boolean
 Private lAutoclose As Long 'in seconds
 Private lAutocloseTrack As Long
@@ -1065,6 +1074,7 @@ Private arBtnX() As Long
 Private bLinkAdjust As Boolean
 Private bEditFooter As Boolean
 Private bEditPassword As Boolean
+Private mPassChar As Integer
 Private bReposTrigger As Boolean
 Private bPublicTimer As Boolean
 Private tDTCur As SYSTEMTIME
@@ -1694,6 +1704,16 @@ End If
 End Property
 Public Property Get ComboCueBanner() As String: ComboCueBanner = m_sComboCue: End Property
 
+Public Property Let InputPasswordChar(ByVal ch As Integer)
+    If ch <> mPassChar Then
+        mPassChar = ch
+        If hEditBox Then
+            SendMessageW hEditBox, EM_SETPASSWORDCHAR, mPassChar, ByVal 0&
+            SetFocusAPI hEditBox 'necessary to get the change visible
+        End If
+    End If
+End Property
+Public Property Get InputPasswordChar() As Integer: InputPasswordChar = mPassChar: End Property
 Public Property Let InputIsPassword(bVal As Boolean)
 If hEditBox Then
     If bEditPassword <> bVal Then
@@ -1705,7 +1725,12 @@ If hEditBox Then
             dwStyle = dwStyle And Not ES_PASSWORD
         End If
         Call SetWindowLong(hEditBox, GWL_STYLE, dwStyle)
-        
+        If bEditPassword = True Then
+            SendMessageW hEditBox, EM_SETPASSWORDCHAR, mPassChar, ByVal 0&
+        Else
+            SendMessageW hEditBox, EM_SETPASSWORDCHAR, 0&, ByVal 0&
+        End If
+        SetFocusAPI hEditBox 'necessary to get the change visible
     End If
 End If
 bEditPassword = bVal
@@ -2601,6 +2626,10 @@ hDateTime2 = 0
 hCombo = 0
 hSlider = 0
 hEditBox = 0
+icoDataN(9) = 0
+icoDataN(8) = 0
+icoDataN(7) = 0
+icoDataN(6) = 0
 icoDataN(5) = 0
 icoDataN(4) = 0
 icoDataN(3) = 0
@@ -2644,6 +2673,7 @@ lSliderChangeS = 1
 lSliderChangeL = 2
 nSliderTickStyle = 0
 nBreaksAdded = 0
+mPassChar = 9679 'Dot
 
 With uTDC
     .CXWidth = 0
@@ -2903,6 +2933,11 @@ Select Case id
     Case TDCBF_CANCEL_BUTTON: icoDataN(3) = hIcon
     Case TDCBF_RETRY_BUTTON: icoDataN(4) = hIcon
     Case TDCBF_CLOSE_BUTTON: icoDataN(5) = hIcon
+    Case TDCBF_ABORT_BUTTON: icoDataN(6) = hIcon
+    Case TDCBF_IGNORE_BUTTON: icoDataN(7) = hIcon
+    Case TDCBF_TRYAGAIN_BUTTON: icoDataN(8) = hIcon
+    Case TDCBF_CONTINUE_BUTTON: icoDataN(9) = hIcon
+    
 End Select
 End Sub
 Public Function zzGetCommonButtonIcon() As LongPtr()
@@ -2969,9 +3004,9 @@ Private Sub Class_Initialize()
 MagicalTDInitFunction 'VBA64 bug hack
 #End If
 hActCtx = INVALID_HANDLE_VALUE
-If (IsComCtl6 = False) And (useropt_no_force_comctl6 = False) Then
-    hShell32 = LoadLibrary("shell32.dll")
 
+hShell32 = LoadLibrary("shell32.dll")
+If (IsComCtl6 = False) And (useropt_no_force_comctl6 = False) Then
     szSys = String$(MAX_PATH, 0)
     Dim cch As Long
     cch = GetSystemDirectoryW(StrPtr(szSys), MAX_PATH)
@@ -3032,6 +3067,7 @@ lSliderChangeS = 1
 lSliderChangeL = 2
 nSliderTickStyle = 0
 m_BtnLRSize = 16
+mPassChar = 9679 'Dot
 hImageRes = LoadLibrary("imageres.dll")
 
 uTDC.cbSize = LenB(uTDC)
@@ -3889,7 +3925,9 @@ Dim i As Long
             SendMessageW hEditBox, WM_SETTEXT, 0&, ByVal StrPtr(sEditText)
             SendMessageW hEditBox, EM_SETSEL, 0&, ByVal (-1&)
         End If
-        
+        If bEditPassword Then
+            SendMessageW hEditBox, EM_SETPASSWORDCHAR, mPassChar, ByVal 0&
+        End If
 
 End Sub
 
@@ -3946,7 +3984,7 @@ Dim sID As String
 sID = "23"
 On Error Resume Next
 If m_HasRadioButtons Then
-    lOffset = UBound(m_uRadioButtons) + 1
+    lOffset = UBound(m_uRadioButtons) '+ 1
 End If
 
 If m_HasCustomButtons Then
@@ -3976,7 +4014,7 @@ If m_HasCustomButtons Then
     J = UBound(m_uButtons) + 1
 End If
 
-For i = 0 To 5
+For i = 0 To 9
     If icoDataN(i) Then
         stay = True
     End If
@@ -4092,6 +4130,79 @@ If (uTDC.dwCommonButtons And TDCBF_CLOSE_BUTTON) Then
     End If
     k = k + 1
 End If
+If (uTDC.dwCommonButtons And TDCBF_ABORT_BUTTON) Then
+    hButton = m_hButton(J + lOffset + k)
+    If icoDataN(6) Then
+        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
+            hIco = LoadImage(hShell32, icoDataN(6), 1, m_BtnLRSize, m_BtnLRSize, 0)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+            Call DestroyIcon(hIco)
+        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
+            hIco = LoadImage(hImageRes, icoDataN(6), 1, m_BtnLRSize, m_BtnLRSize, 0)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+            Call DestroyIcon(hIco)
+        Else
+            hIco = icoDataN(6)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+        End If
+    End If
+    k = k + 1
+End If
+If (uTDC.dwCommonButtons And TDCBF_IGNORE_BUTTON) Then
+    hButton = m_hButton(J + lOffset + k)
+    If icoDataN(7) Then
+        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
+            hIco = LoadImage(hShell32, icoDataN(7), 1, m_BtnLRSize, m_BtnLRSize, 0)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+            Call DestroyIcon(hIco)
+        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
+            hIco = LoadImage(hImageRes, icoDataN(7), 1, m_BtnLRSize, m_BtnLRSize, 0)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+            Call DestroyIcon(hIco)
+        Else
+            hIco = icoDataN(7)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+        End If
+    End If
+    k = k + 1
+End If
+If (uTDC.dwCommonButtons And TDCBF_TRYAGAIN_BUTTON) Then
+    hButton = m_hButton(J + lOffset + k)
+    If icoDataN(8) Then
+        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
+            hIco = LoadImage(hShell32, icoDataN(8), 1, m_BtnLRSize, m_BtnLRSize, 0)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+            Call DestroyIcon(hIco)
+        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
+            hIco = LoadImage(hImageRes, icoDataN(8), 1, m_BtnLRSize, m_BtnLRSize, 0)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+            Call DestroyIcon(hIco)
+        Else
+            hIco = icoDataN(8)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+        End If
+    End If
+    k = k + 1
+End If
+If (uTDC.dwCommonButtons And TDCBF_CONTINUE_BUTTON) Then
+    hButton = m_hButton(J + lOffset + k)
+    If icoDataN(9) Then
+        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
+            hIco = LoadImage(hShell32, icoDataN(9), 1, m_BtnLRSize, m_BtnLRSize, 0)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+            Call DestroyIcon(hIco)
+        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
+            hIco = LoadImage(hImageRes, icoDataN(9), 1, m_BtnLRSize, m_BtnLRSize, 0)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+            Call DestroyIcon(hIco)
+        Else
+            hIco = icoDataN(9)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+        End If
+    End If
+    k = k + 1
+End If
+
 End Function
 Private Sub InputReposition()
 If hEditBox Then

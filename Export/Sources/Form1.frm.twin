@@ -276,7 +276,8 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .Content = "The password is: password"
         .Flags = TDF_INPUT_BOX
         .InputIsPassword = True
-        .InputAlign = TDIBA_Buttons
+        .VerifyText = "Show password"
+        .InputAlign = TDIBA_Content
         .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
         .SetButtonElevated TD_OK, 1
         .SetButtonHold TD_OK
@@ -1669,6 +1670,13 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         TaskDialog2.ProgressStartMarquee
     End If
     End Sub
-
+    
+    Private Sub TaskDialogPW_VerificationClicked(ByVal Value As Long) Handles TaskDialogPW.VerificationClicked
+        If Value = 1 Then
+            TaskDialogPW.InputPasswordChar = 0
+        Else
+            TaskDialogPW.InputPasswordChar = 9679
+        End If
+    End Sub
 
 End Class

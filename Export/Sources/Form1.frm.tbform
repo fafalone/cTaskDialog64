@@ -21,15 +21,12 @@
 		"FontStrikethru": false,
 		"FontTransparent": true,
 		"FontUnderline": false,
-		"ForeColor": -2147483630,
+		"ForeColor": 0,
 		"FormDesignerId": "{6F7672BF-AA57-4571-B865-DDF762FD2B4C}",
 		"HasDC": true,
 		"Height": 424,
 		"HelpContextID": 0,
 		"Icon": "",
-		"Index": -1,
-		"InternalPrinterUserScaleWidthX": 1,
-		"InternalPrinterUserScaleWidthY": 1,
 		"KeyPreview": false,
 		"Left": 0,
 		"LinkMode": "vbLinkNone",
@@ -79,7 +76,7 @@
 			"showGrid": true,
 			"showOutlines": false
 		},
-		"__lastUpdateMarker": 3400490690,
+		"__lastUpdateMarker": 198568021,
 		"_children": [
 			{
 				"Alignment": "vbLeftJustify",
@@ -88,16 +85,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": "(main result)",
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -108,12 +128,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 14,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 212,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -136,8 +157,7 @@
 				"Width": 199,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -146,16 +166,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": "(radio result)",
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -166,12 +209,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 17,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 212,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -194,8 +238,7 @@
 				"Width": 202,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -204,16 +247,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": "(checkbox result)",
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -224,12 +290,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 16,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 213,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -252,8 +319,7 @@
 				"Width": 240,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -262,16 +328,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": "Input box result:",
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -282,12 +371,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 16,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 215,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -310,8 +400,7 @@
 				"Width": 83,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -320,16 +409,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": null,
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -340,12 +452,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 17,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 299,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -368,8 +481,7 @@
 				"Width": 212,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -378,16 +490,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": "Combo text:",
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -398,12 +533,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 17,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 214,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -426,8 +562,7 @@
 				"Width": 62,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -436,16 +571,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": null,
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -456,12 +614,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 16,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 278,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -484,8 +643,7 @@
 				"Width": 228,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -494,16 +652,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": "Combo index:",
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -514,12 +695,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 17,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 213,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -542,8 +724,7 @@
 				"Width": 72,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -552,16 +733,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": null,
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -572,12 +776,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 15,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 285,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -600,8 +805,7 @@
 				"Width": 37,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -610,16 +814,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": "Date/Time:",
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -630,12 +857,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 15,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 212,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -658,8 +886,7 @@
 				"Width": 58,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -668,16 +895,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": null,
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -688,12 +938,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 17,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 267,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -716,8 +967,7 @@
 				"Width": 218,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -726,16 +976,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": "DT Check:",
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -746,12 +1019,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 16,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 213,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -774,8 +1048,7 @@
 				"Width": 50,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -784,16 +1057,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": null,
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -804,12 +1100,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 16,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 263,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -832,8 +1129,7 @@
 				"Width": 229,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -842,16 +1138,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": "Slider: ",
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -862,12 +1181,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 13,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 214,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -890,8 +1210,7 @@
 				"Width": 35,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -900,16 +1219,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": false,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFOpaque",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": null,
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -920,12 +1262,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 16,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 247,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -948,8 +1291,7 @@
 				"Width": 94,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -958,16 +1300,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": true,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFTransparent",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": "Page:",
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -978,12 +1343,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 13,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 213,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -1006,8 +1372,7 @@
 				"Width": 28,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Alignment": "vbLeftJustify",
@@ -1016,16 +1381,39 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
+				"Angle": 0,
 				"Appearance": "vbAppear3d",
 				"AutoSize": true,
 				"BackColor": -2147483633,
 				"BackStyle": "vbBFTransparent",
+				"BorderCustomOptions": {
+					"Bottom": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Left": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Right": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					},
+					"Top": {
+						"Color": 0,
+						"Padding": 0,
+						"Size": 0
+					}
+				},
 				"BorderStyle": "vbNoBorder",
 				"Caption": null,
 				"DataField": null,
+				"DataFieldAggregate": "vbAggregateNone",
 				"DataFormat": null,
 				"DataMember": null,
 				"DataSource": null,
@@ -1036,12 +1424,13 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 0,
 				"Index": -1,
+				"InternalSectionId": -1,
 				"Left": 242,
 				"LineSpacing": 0,
 				"LinkItem": null,
@@ -1064,8 +1453,7 @@
 				"Width": 0,
 				"WordWrap": false,
 				"_className": "Label",
-				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}",
-				"_paintedByParent": true
+				"_clsid": "{33AD4ED8-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Anchors": {
@@ -1073,7 +1461,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1091,7 +1478,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1122,7 +1509,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 57,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1134,7 +1520,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1152,7 +1537,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1183,7 +1568,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 62,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1195,7 +1579,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1213,7 +1596,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1244,7 +1627,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 59,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1256,7 +1638,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1274,7 +1655,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1305,7 +1686,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 58,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1317,7 +1697,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1335,7 +1714,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1366,7 +1745,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1378,7 +1756,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1396,7 +1773,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1427,7 +1804,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1439,7 +1815,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1457,7 +1832,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1488,7 +1863,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1500,7 +1874,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1518,14 +1891,14 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 19,
 				"HelpContextID": 0,
 				"Index": -1,
-				"Left": 310.6,
+				"Left": 311,
 				"MaskColor": 12632256,
 				"MouseIcon": "",
 				"MousePointer": "vbDefault",
@@ -1549,7 +1922,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1561,7 +1933,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1579,7 +1950,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1610,7 +1981,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1622,7 +1992,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1640,7 +2009,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1671,7 +2040,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1683,7 +2051,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1701,14 +2068,14 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 19,
 				"HelpContextID": 0,
 				"Index": -1,
-				"Left": 209.4,
+				"Left": 209,
 				"MaskColor": 12632256,
 				"MouseIcon": "",
 				"MousePointer": "vbDefault",
@@ -1732,7 +2099,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1744,7 +2110,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1762,14 +2127,14 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 19,
 				"HelpContextID": 0,
 				"Index": -1,
-				"Left": 310.6,
+				"Left": 311,
 				"MaskColor": 12632256,
 				"MouseIcon": "",
 				"MousePointer": "vbDefault",
@@ -1793,7 +2158,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1805,7 +2169,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1823,7 +2186,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1854,7 +2217,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1871,8 +2233,7 @@
 				"Top": 129,
 				"Width": 27,
 				"_className": "Timer",
-				"_clsid": "{33AD4F28-6699-11CF-B70C-00AA0060D393}",
-				"_isInvisible": true
+				"_clsid": "{33AD4F28-6699-11CF-B70C-00AA0060D393}"
 			},
 			{
 				"Anchors": {
@@ -1880,7 +2241,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1898,7 +2258,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1929,7 +2289,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 69,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -1941,7 +2300,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -1959,7 +2317,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -1990,7 +2348,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -2002,7 +2359,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -2020,7 +2376,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -2051,7 +2407,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -2063,7 +2418,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -2081,7 +2435,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -2112,7 +2466,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -2124,7 +2477,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -2142,14 +2494,14 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
 				"Height": 19,
 				"HelpContextID": 0,
 				"Index": -1,
-				"Left": 310.6,
+				"Left": 311,
 				"MaskColor": 12632256,
 				"MouseIcon": "",
 				"MousePointer": "vbDefault",
@@ -2173,7 +2525,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -2185,7 +2536,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -2203,7 +2553,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -2234,7 +2584,6 @@
 				"VisualStyles": true,
 				"WhatsThisHelpID": 0,
 				"Width": 99,
-				"_Default": false,
 				"_className": "CommandButton",
 				"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 				"_hasExclusiveCancelProp": true,
@@ -2246,7 +2595,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -2261,7 +2609,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -2271,6 +2619,8 @@
 				"Left": 8,
 				"MouseIcon": "",
 				"MousePointer": "vbDefault",
+				"MultiFramePosition": -1,
+				"MultiFrameSize": 0,
 				"Name": "Frame1",
 				"OLEDropMode": "vbOLEDropNone",
 				"Opacity": 100,
@@ -2291,7 +2641,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -2309,7 +2658,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -2340,7 +2689,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -2352,7 +2700,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -2370,7 +2717,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -2394,14 +2741,13 @@
 						"TabStop": true,
 						"Tag": null,
 						"ToolTipText": null,
-						"Top": 40.4666666666667,
+						"Top": 40,
 						"TransparencyKey": -1,
 						"UseMaskColor": false,
 						"Visible": true,
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -2413,7 +2759,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -2431,7 +2776,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -2462,7 +2807,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -2474,7 +2818,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -2492,7 +2835,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -2523,7 +2866,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -2535,7 +2877,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -2553,7 +2894,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -2577,14 +2918,13 @@
 						"TabStop": true,
 						"Tag": null,
 						"ToolTipText": null,
-						"Top": 40.4666666666667,
+						"Top": 40,
 						"TransparencyKey": -1,
 						"UseMaskColor": false,
 						"Visible": true,
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -2596,7 +2936,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -2614,7 +2953,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -2645,7 +2984,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -2662,7 +3000,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -2677,7 +3014,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -2687,6 +3024,8 @@
 				"Left": 5,
 				"MouseIcon": "",
 				"MousePointer": "vbDefault",
+				"MultiFramePosition": -1,
+				"MultiFrameSize": 0,
 				"Name": "Frame2",
 				"OLEDropMode": "vbOLEDropNone",
 				"Opacity": 100,
@@ -2707,7 +3046,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -2725,7 +3063,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -2756,7 +3094,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -2768,7 +3105,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -2786,7 +3122,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -2817,7 +3153,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -2829,7 +3164,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -2847,7 +3181,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -2878,7 +3212,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -2890,7 +3223,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -2908,7 +3240,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -2939,7 +3271,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -2956,7 +3287,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -2971,7 +3301,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -2981,6 +3311,8 @@
 				"Left": 8,
 				"MouseIcon": "",
 				"MousePointer": "vbDefault",
+				"MultiFramePosition": -1,
+				"MultiFrameSize": 0,
 				"Name": "Frame3",
 				"OLEDropMode": "vbOLEDropNone",
 				"Opacity": 100,
@@ -3001,7 +3333,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3019,7 +3350,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3050,7 +3381,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3062,7 +3392,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3080,7 +3409,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3111,7 +3440,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3123,7 +3451,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3141,7 +3468,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3172,7 +3499,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3184,7 +3510,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3202,7 +3527,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3233,7 +3558,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3245,7 +3569,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3263,7 +3586,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3294,7 +3617,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3306,7 +3628,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3324,7 +3645,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3355,7 +3676,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3367,7 +3687,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3385,7 +3704,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3416,7 +3735,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 91,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3428,7 +3746,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3446,7 +3763,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3477,7 +3794,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 92,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3494,7 +3810,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -3509,7 +3824,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -3519,6 +3834,8 @@
 				"Left": 7,
 				"MouseIcon": "",
 				"MousePointer": "vbDefault",
+				"MultiFramePosition": -1,
+				"MultiFrameSize": 0,
 				"Name": "Frame4",
 				"OLEDropMode": "vbOLEDropNone",
 				"Opacity": 100,
@@ -3539,7 +3856,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3557,7 +3873,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3588,7 +3904,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 90,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3600,7 +3915,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3618,7 +3932,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3649,7 +3963,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 89,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3666,7 +3979,6 @@
 					"Left": true,
 					"Right": false,
 					"Top": true,
-					"_className": "Anchors",
 					"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 				},
 				"Appearance": "vbAppear3d",
@@ -3681,7 +3993,7 @@
 				"FontBold": false,
 				"FontItalic": false,
 				"FontName": "Segoe UI",
-				"FontSize": 8,
+				"FontSize": 8.25,
 				"FontStrikethru": false,
 				"FontUnderline": false,
 				"ForeColor": -2147483630,
@@ -3691,6 +4003,8 @@
 				"Left": 6,
 				"MouseIcon": "",
 				"MousePointer": "vbDefault",
+				"MultiFramePosition": -1,
+				"MultiFrameSize": 0,
 				"Name": "Frame5",
 				"OLEDropMode": "vbOLEDropNone",
 				"Opacity": 100,
@@ -3711,7 +4025,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3729,7 +4042,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3760,7 +4073,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 90,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3772,7 +4084,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3790,7 +4101,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3821,7 +4132,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 90,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3833,7 +4143,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3851,7 +4160,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3882,7 +4191,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 136,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3894,7 +4202,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3912,7 +4219,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -3943,7 +4250,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 90,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
@@ -3955,7 +4261,6 @@
 							"Left": true,
 							"Right": false,
 							"Top": true,
-							"_className": "Anchors",
 							"_clsid": "{8524D4B5-72A9-40A9-A189-29E7905C40CA}"
 						},
 						"Appearance": "vbAppear3d",
@@ -3973,7 +4278,7 @@
 						"FontBold": false,
 						"FontItalic": false,
 						"FontName": "Segoe UI",
-						"FontSize": 8,
+						"FontSize": 8.25,
 						"FontStrikethru": false,
 						"FontUnderline": false,
 						"ForeColor": -2147483630,
@@ -4004,7 +4309,6 @@
 						"VisualStyles": true,
 						"WhatsThisHelpID": 0,
 						"Width": 90,
-						"_Default": false,
 						"_className": "CommandButton",
 						"_clsid": "{33AD4EF0-6699-11CF-B70C-00AA0060D393}",
 						"_hasExclusiveCancelProp": true,
