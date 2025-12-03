@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.6 Universal Compatibility Version
+'cTaskDialog v1.6 R2 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
@@ -56,6 +56,8 @@ Option Explicit
 '*************************************************
 'VERSION HISTORY
 '
+'Version 1.6.2 (1.6 R2)
+'-Common button icon for Help should not have been excluded.
 'Version 1.6.0
 '-Add property InputPasswordChar to set a custom password char.
 '  Set as a Unicode AscW value (Integer). The black dot is the default.
@@ -1036,7 +1038,7 @@ Private bRadDis As Boolean
 Private btnCaps() As String 'weird things happen if these are set but not stored
 Private rbtnCaps() As String
 Private icoDataC() As LongPtr 'icon data for custom buttons
-Private icoDataN(9) As LongPtr 'icon data for normal buttons
+Private icoDataN(10) As LongPtr 'icon data for normal buttons
 Private bAutoclose As Boolean
 Private lAutoclose As Long 'in seconds
 Private lAutocloseTrack As Long
@@ -2626,6 +2628,7 @@ hDateTime2 = 0
 hCombo = 0
 hSlider = 0
 hEditBox = 0
+icoDataN(10) = 0
 icoDataN(9) = 0
 icoDataN(8) = 0
 icoDataN(7) = 0
@@ -2937,7 +2940,7 @@ Select Case id
     Case TDCBF_IGNORE_BUTTON: icoDataN(7) = hIcon
     Case TDCBF_TRYAGAIN_BUTTON: icoDataN(8) = hIcon
     Case TDCBF_CONTINUE_BUTTON: icoDataN(9) = hIcon
-    
+    Case TDCBF_HELP_BUTTON: icoDataN(10) = hIcon
 End Select
 End Sub
 Public Function zzGetCommonButtonIcon() As LongPtr()
@@ -4014,7 +4017,7 @@ If m_HasCustomButtons Then
     J = UBound(m_uButtons) + 1
 End If
 
-For i = 0 To 9
+For i = 0 To 10
     If icoDataN(i) Then
         stay = True
     End If
@@ -4197,6 +4200,24 @@ If (uTDC.dwCommonButtons And TDCBF_CONTINUE_BUTTON) Then
             Call DestroyIcon(hIco)
         Else
             hIco = icoDataN(9)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+        End If
+    End If
+    k = k + 1
+End If
+If (uTDC.dwCommonButtons And TDCBF_HELP_BUTTON) Then
+    hButton = m_hButton(J + lOffset + k)
+    If icoDataN(10) Then
+        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
+            hIco = LoadImage(hShell32, icoDataN(10), 1, m_BtnLRSize, m_BtnLRSize, 0)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+            Call DestroyIcon(hIco)
+        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
+            hIco = LoadImage(hImageRes, icoDataN(10), 1, m_BtnLRSize, m_BtnLRSize, 0)
+            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+            Call DestroyIcon(hIco)
+        Else
+            hIco = icoDataN(10)
             Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
         End If
     End If
