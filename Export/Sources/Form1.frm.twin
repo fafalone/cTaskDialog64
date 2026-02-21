@@ -204,6 +204,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .IconMain = TD_INFORMATION_ICON
         .Title = "cTaskDialog Project"
         .ParenthWnd = Me.hWnd
+        .InputBoxMaxLength = 4
         .ShowDialog
     
         Label5.Caption = .ResultInput

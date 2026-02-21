@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.6 R2 Universal Compatibility Version
+'cTaskDialog v1.7 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
@@ -22,7 +22,7 @@ Option Explicit
 '
 'https://www.vbforums.com/showthread.php?777021
 '
-'Released 02 December 2025
+'Released 20 February 2026
 '************************************************************
 '
 '
@@ -56,6 +56,11 @@ Option Explicit
 '*************************************************
 'VERSION HISTORY
 '
+'Version 1.7.0
+'-Add InputBoxMaxLength property to set maximum number of characters.
+'-Apply temporary fix for icon/button matching: https://github.com/fafalone/cTaskDialog64/issues/18
+'--Temp fix only applies when both radio buttons and command links are used,
+'   until I have a chance to investigate other scenarios.
 'Version 1.6.2 (1.6 R2)
 '-Common button icon for Help should not have been excluded.
 'Version 1.6.0
@@ -374,6 +379,7 @@ Private Const EM_SETSEL As Long = &HB1
 Private Const ECM_FIRST As Long = &H1500
 Private Const EM_SETCUEBANNER As Long = (ECM_FIRST + 1)
 Private Const EM_SETPASSWORDCHAR As Long = &HCC
+Private Const EM_LIMITTEXT = &HC5
 Private Const ES_LEFT = &H0
 Private Const ES_CENTER = &H1
 Private Const ES_RIGHT = &H2
@@ -1104,6 +1110,7 @@ Private m_Icon As LongPtr, m_IconFooter As LongPtr
 Private m_HasCustomButtons As Boolean, m_HasRadioButtons As Boolean
 Private m_hButton() As LongPtr
 Private m_BtnLRSize As Long
+Private mInputTextMaxLen As Long
 Private nInputAlign As TDInputBoxAlign
 Private nComboAlign As TDInputBoxAlign
 Private mInputTextAlign As TDInputBoxTextAlign
@@ -1689,6 +1696,17 @@ If mInputTextAlign <> nAlign Then
 End If
 End Property
 
+Public Property Get InputBoxMaxLength() As Long
+    InputBoxMaxLength = mInputTextMaxLen
+End Property
+Public Property Let InputBoxMaxLength(ByVal nMaxChars As Long)
+    If mInputTextMaxLen <> nMaxChars Then
+        mInputTextMaxLen = nMaxChars
+        If hEditBox Then
+            SendMessageW hEditBox, EM_LIMITTEXT, mInputTextMaxLen, ByVal 0&
+        End If
+    End If
+End Property
 Public Property Get ExpandedInfo() As String: ExpandedInfo = m_sExpandedInfo: End Property
 
 Public Property Let InputCueBanner(sText As String)
@@ -2644,6 +2662,7 @@ m_BtnLRSize = 16
 bDis = False
 bRadDis = False
 bElv = False
+mInputTextMaxLen = 0
 nInputAlign = TDIBA_Content
 nComboAlign = TDIBA_Content
 mInputTextAlign = TDIBTA_Left
@@ -3931,6 +3950,9 @@ Dim i As Long
         If bEditPassword Then
             SendMessageW hEditBox, EM_SETPASSWORDCHAR, mPassChar, ByVal 0&
         End If
+        If mInputTextMaxLen Then
+            SendMessageW hEditBox, EM_LIMITTEXT, mInputTextMaxLen, ByVal 0&
+        End If
 
 End Sub
 
@@ -3983,11 +4005,14 @@ Dim lOffset As Long
 Dim hButton As LongPtr
 Dim stay As Boolean
 Dim hIco As LongPtr
-Dim sID As String
-sID = "23"
+
 On Error Resume Next
+
 If m_HasRadioButtons Then
     lOffset = UBound(m_uRadioButtons) '+ 1
+End If
+If (m_HasRadioButtons = True) And ((uTDC.dwFlags And TDF_USE_COMMAND_LINKS) = TDF_USE_COMMAND_LINKS) Then
+    lOffset = 0
 End If
 
 If m_HasCustomButtons Then
