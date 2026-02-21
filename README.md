@@ -1,10 +1,16 @@
 # cTaskDialog
-### Current Version: v1.6 Universal Compatibility Version
+### Current Version: v1.7 Universal Compatibility Version
 
 **Quick Start:** Add cTaskDialog.cls and mTDHelper.bas to your project-- these are the only two required files for your code.
 
 
 cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64
+
+**Update (v1.7.0, 20 Feb 2026):**
+- Add InputBoxMaxLength property to set maximum number of characters.
+- Apply temporary fix for icon/button matching: https://github.com/fafalone/cTaskDialog64/issues/18  
+  Temp fix only applies when both radio buttons and command links are used,
+  until I have a chance to investigate other scenarios.
 
 **Update (v1.6.2, 02 Dec 2025):** Common button icon for Help should not have been excluded.\
 **Update (v1.6.0, 02 Dec 2025):** 
