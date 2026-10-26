@@ -8,6 +8,7 @@ cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additiona
 
 **Update (v1.8.0, 26 Oct 2026):**
 - Added Tab/Shift+Tab navigation support for all custom controls.
+- Added method AddModalWindow, to disable interaction with other hwnds besides the immediate parent (you must still specify .ParentHwnd to be modal to that window). It wasn't practical to add an automatic 'app modal' option that wasn't insane/unstable across VB6, tB, and VBA.
 - More generalized fix for button icon order issue, as it occurred in many other scenarios.
 
 **Update (v1.7.0, 20 Feb 2026):**
