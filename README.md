@@ -1,10 +1,14 @@
 # cTaskDialog
-### Current Version: v1.7 Universal Compatibility Version
+### Current Version: v1.8 Universal Compatibility Version
 
 **Quick Start:** Add cTaskDialog.cls and mTDHelper.bas to your project-- these are the only two required files for your code.
 
 
 cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64
+
+**Update (v1.8.0, 26 Oct 2026):**
+- Added Tab/Shift+Tab navigation support for all custom controls.
+- More generalized fix for button icon order issue, as it occurred in many other scenarios.
 
 **Update (v1.7.0, 20 Feb 2026):**
 - Add InputBoxMaxLength property to set maximum number of characters.
