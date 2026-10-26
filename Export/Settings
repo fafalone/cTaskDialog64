@@ -48,9 +48,9 @@
 	"project.versionFileDescription": "cTaskDialog Demo App",
 	"project.versionLegalCopyright": "©2014 -2026",
 	"project.versionMajor": 1,
-	"project.versionMinor": 7,
+	"project.versionMinor": 8,
 	"project.versionProductName": "cTaskDialog Sample Project",
-	"project.versionRevision": 32,
+	"project.versionRevision": 34,
 	"project.warnings": {
 		"errors": [],
 		"hints": [],

@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.7 Universal Compatibility Version
+'cTaskDialog v1.8 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
@@ -22,7 +22,7 @@ Option Explicit
 '
 'https://www.vbforums.com/showthread.php?777021
 '
-'Released 20 February 2026
+'Released 26 October 2026
 '************************************************************
 '
 '
@@ -56,20 +56,34 @@ Option Explicit
 '*************************************************
 'VERSION HISTORY
 '
+'
+'Version 1.8.0
+'- Added Tab/Shift+Tab navigation support for all custom controls.
+'- Added method AddModalWindow, to disable interaction with other hwnds
+' besides the immediate parent (you must still specify .ParentHwnd to
+' be modal to that window). It wasn't practical to add an automatic 'app
+' modal' option that wasn't insane/unstable across VB6, tB, and VBA.
+'- More generalized fix for button icon order issue, as it occurred in
+' many other scenarios.
+'- Demos: Updated included .res file to work with VB6 SP5; also architecture
+' to * so if you import to tB 64bit will work without modifying it.
+'
 'Version 1.7.0
-'-Add InputBoxMaxLength property to set maximum number of characters.
-'-Apply temporary fix for icon/button matching: https://github.com/fafalone/cTaskDialog64/issues/18
-'--Temp fix only applies when both radio buttons and command links are used,
+'- Add InputBoxMaxLength property to set maximum number of characters.
+'- Apply temporary fix for icon/button matching: https://github.com/fafalone/cTaskDialog64/issues/18  
+' - -Temp fix only applies when both radio buttons and command links are used,
 '   until I have a chance to investigate other scenarios.
+'
 'Version 1.6.2 (1.6 R2)
-'-Common button icon for Help should not have been excluded.
+'- Common button icon for Help should not have been excluded.
+'
 'Version 1.6.0
-'-Add property InputPasswordChar to set a custom password char.
+'- Add property InputPasswordChar to set a custom password char.
 '  Set as a Unicode AscW value (Integer). The black dot is the default.
-'-Common button icons now supported for Abort, Ignore, Try Again, and Continue.
-'-Bug fix: Custom button icons off by one if radio buttons present
-'-Bug fix: Shell32 Icon IDs could fail without explicitly loading shell32.dll. 
-'-Demos: twinBASIC Password demo updated to show use of the VerifyText checkbox to 
+'- Common button icons now supported for Abort, Ignore, Try Again, and Continue.
+'- Bug fix: Custom button icons off by one if radio buttons present
+'- Bug fix: Shell32 Icon IDs could fail without explicitly loading shell32.dll. 
+'- Demos: twinBASIC Password demo updated to show use of the VerifyText checkbox to 
 '    toggle whether the password is visible by using .InputPasswordChar
 
 'Version 1.5.3 (1.5 R3)
@@ -334,7 +348,6 @@ Option Explicit
 'possible simply by setting .hInstance to their handle and specifying the index.
 'See the new custom flags, and the readme for full details
 
-
 '*******************************************************************************
 'USER OPTIONS : Configuration for developers using this class.
 Private Const useropt_dbg_PrintToImmediate As Boolean = False
@@ -457,6 +470,60 @@ Private Type POINTAPI
     X As Long
     Y As Long
 End Type
+'Keyboard navigation for the added controls (see zz_ProcessGetMsg)
+Private Const WM_NULL As Long = &H0
+Private Const WM_KEYDOWN As Long = &H100
+Private Const WM_GETDLGCODE As Long = &H87
+Private Const WM_CHANGEUISTATE As Long = &H127
+Private Const WM_TDTABCHECK As Long = &HB0D1& 'WM_APP range; we post it to the dialog and swallow it again (see zz_ProcessGetMsg)
+Private Const WM_SETFOCUS As Long = &H7
+Private Const WM_SYSKEYDOWN As Long = &H104
+Private Const WM_LBUTTONDOWN As Long = &H201
+Private Const WM_RBUTTONDOWN As Long = &H204
+Private Const WM_MBUTTONDOWN As Long = &H207
+Private Const UIS_CLEAR_HIDEFOCUS As Long = &H10002 'MAKEWPARAM(UIS_CLEAR, UISF_HIDEFOCUS)
+Private Const DLGC_HASSETSEL As Long = &H8
+Private Const VK_TAB As Long = &H9
+Private Const VK_SHIFT As Long = &H10
+Private Const VK_CONTROL As Long = &H11
+Private Const VK_MENU As Long = &H12
+Private Const VK_LWIN As Long = &H5B
+Private Const VK_RWIN As Long = &H5C
+Private Const VK_LSHIFT As Long = &HA0 'VK_LSHIFT..VK_RMENU: left/right Shift, Ctrl, Alt
+Private Const VK_RMENU As Long = &HA5
+Private Const GW_HWNDNEXT As Long = 2
+Private Const GW_CHILD As Long = 5
+Private Const BM_GETCHECK As Long = &HF0
+Private Const BST_CHECKED As Long = 1
+Private Const BS_TYPEMASK As Long = &HF
+Private Const BS_RADIOBUTTON As Long = &H4
+Private Const BS_AUTORADIOBUTTON As Long = &H9
+Private Const WS_EX_LAYOUTRTL As Long = &H400000
+Private Const IDHELP As Long = 9
+Private Const TS_NATIVE As Long = 0 'tab stop kinds: a control DirectUI hosts...
+Private Const TS_RADIOS As Long = 1 '...the radio buttons, as one group stop...
+Private Const TS_OURS As Long = 2   '...or one of the controls this class adds
+Private Type TDTabStop
+    hWnd As LongPtr 'window that gets focus when the stop is entered
+    nKind As Long   'TS_*
+    rc As RECT      'screen rect, for reading order
+End Type
+Private Type MSG
+    hWnd As LongPtr
+    message As Long
+    wParam As LongPtr
+    lParam As LongPtr
+    Time As Long 'cased like the built-in so the VB6 IDE doesn't recase Time elsewhere
+    pt As POINTAPI
+End Type
+Private m_bBackTabPending As Boolean 'a Shift+Tab went to DirectUI and focus hasn't landed yet (see zz_ProcessGetMsg)
+Private m_hBackTabFrom As LongPtr    'where focus was when that Shift+Tab went to DirectUI
+Private m_bOwnFocusMove As Boolean   'True while we move focus ourselves
+Private m_sTabStopsLogged As String 'last stop list written to the [Tab] debug log
+Private m_hModalTo() As LongPtr      'AddModalWindow's list
+Private m_nModalTo As Long
+Private m_hModalOff() As LongPtr     'the ones ShowDialog disabled
+Private m_nModalOff As Long
 Private Type NMHDR
   hWndFrom As LongPtr   ' Window handle of control sending message
   idFrom As LongPtr      ' Identifier of control sending message
@@ -830,7 +897,7 @@ Private Type TASKDIALOGCONFIG
 End Type
 
 #If VBA7 Then
-	
+    
     #If (Win64 <> 0) And (TWINBASIC = 0) Then
         'VBA7 does not support the packing alignment attribute that makes calling this easy in twinBASIC; x64 inserts padding this particular API doesn't expect.
         Private Type TASKDIALOG_BUTTON_VBA7
@@ -913,6 +980,14 @@ Private Declare PtrSafe Function ActivateActCtx Lib "kernel32" (ByVal hActCtx As
 Private Declare PtrSafe Function DeactivateActCtx Lib "kernel32" (ByVal dwFlags As DeactivateActCtxFlags, ByVal lpCookie As LongPtr) As Long
 Private Declare PtrSafe Sub ReleaseActCtx Lib "kernel32" (ByVal hActCtx As LongPtr)
 Private Declare PtrSafe Function GetSystemDirectoryW Lib "kernel32" (ByVal lpBuffer As LongPtr, ByVal uSize As Long) As Long
+Private Declare PtrSafe Function GetFocus Lib "user32" () As LongPtr
+Private Declare PtrSafe Function GetWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal uCmd As Long) As LongPtr
+Private Declare PtrSafe Function IsChild Lib "user32" (ByVal hWndParent As LongPtr, ByVal hWnd As LongPtr) As Long
+Private Declare PtrSafe Function IsWindowVisible Lib "user32" (ByVal hWnd As LongPtr) As Long
+Private Declare PtrSafe Function IsWindowEnabled Lib "user32" (ByVal hWnd As LongPtr) As Long
+Private Declare PtrSafe Function GetKeyState Lib "user32" (ByVal nVirtKey As Long) As Integer
+Private Declare PtrSafe Function PostMessageW Lib "user32" (ByVal hWnd As LongPtr, ByVal wMsg As Long, ByVal wParam As LongPtr, ByVal lParam As LongPtr) As Long
+Private Declare PtrSafe Function EnableWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal bEnable As Long) As Long
                                                                                                                                                                                      
 #Else
 Private Declare Function TaskDialog Lib "comctl32.dll" _
@@ -982,6 +1057,14 @@ Private Declare Function ActivateActCtx Lib "kernel32" (ByVal hActCtx As Long, l
 Private Declare Function DeactivateActCtx Lib "kernel32" (ByVal dwFlags As DeactivateActCtxFlags, ByVal lpCookie As Long) As Long
 Private Declare Sub ReleaseActCtx Lib "kernel32" (ByVal hActCtx As Long)
 Private Declare Function GetSystemDirectoryW Lib "kernel32" (ByVal lpBuffer As Long, ByVal uSize As Long) As Long
+Private Declare Function GetFocus Lib "user32" () As Long
+Private Declare Function GetWindow Lib "user32" (ByVal hWnd As Long, ByVal uCmd As Long) As Long
+Private Declare Function IsChild Lib "user32" (ByVal hWndParent As Long, ByVal hWnd As Long) As Long
+Private Declare Function IsWindowVisible Lib "user32" (ByVal hWnd As Long) As Long
+Private Declare Function IsWindowEnabled Lib "user32" (ByVal hWnd As Long) As Long
+Private Declare Function GetKeyState Lib "user32" (ByVal nVirtKey As Long) As Integer
+Private Declare Function PostMessageW Lib "user32" (ByVal hWnd As Long, ByVal wMsg As Long, ByVal wParam As Long, ByVal lParam As Long) As Long
+Private Declare Function EnableWindow Lib "user32" (ByVal hWnd As Long, ByVal bEnable As Long) As Long
 
 #End If
 
@@ -1338,7 +1421,9 @@ Select Case uNotification
         If (uTDC.dwFlags And TDF_DATETIME) Then AddDateTime: bSC = True
         If (uTDC.dwFlags And TDF_SLIDER) Then AddSlider: bSC = True
         If (hLogoImage) Then AddLogo: bSC = True
+        If m_HasCustomControl Then TabLog "TaskDialog's own focus: " & FocusDesc(GetFocus())
         If m_HasCustomControl = True Then FocusMainControl
+        If m_HasCustomControl Then StartTabSupport 'Tab/Shift+Tab into the added controls
         If bSC Then 'combo box subclasses different hWnds in the Add func
             Subclass2 hUI, AddressOf TaskDialogSubclassProc, m_TDhWnd, ObjPtr(Me)
         End If
@@ -1359,6 +1444,7 @@ Select Case uNotification
             zz_ProcessCallback = S_OK
         End If
         RaiseEvent ButtonClick(CLng(wParam))
+        If (zz_ProcessCallback = S_OK) And (CLng(wParam) <> IDHELP) Then ModalWindowsEnable 'closing; see ModalWindowsEnable
         Exit Function
     Case TDN_TIMER
         dtAC2 = Now
@@ -1472,7 +1558,9 @@ Select Case uNotification
         If (uTDC.dwFlags And TDF_DATETIME) Then AddDateTime: bSC = True
         If (uTDC.dwFlags And TDF_SLIDER) Then AddSlider: bSC = True
         If (hLogoImage) Then AddLogo
+        If m_HasCustomControl Then TabLog "TaskDialog's own focus: " & FocusDesc(GetFocus())
         If m_HasCustomControl = True Then FocusMainControl
+        If m_HasCustomControl Then StartTabSupport 'Tab/Shift+Tab into the added controls
         If bSC Then 'combo box subclasses different hWnds in the Add func
             Subclass2 hUI, AddressOf TaskDialogSubclassProc, m_TDhWnd, ObjPtr(Me)
         End If
@@ -1494,10 +1582,10 @@ Select Case uNotification
                 If nComboIdx >= 0 Then
                     sComboText = aComboItems(nComboIdx).sText
                 Else
-                	sComboText = ""
+                    sComboText = ""
                 End If
             Else
-            	sComboText = GetComboTextW(hEditCombo)
+                sComboText = GetComboTextW(hEditCombo)
             End If
         End If
         Dim rs As Long
@@ -1522,6 +1610,7 @@ Select Case uNotification
         If hSlider Then
             lSliderValue = CLng(SendMessageW(hSlider, TBM_GETPOS, 0, ByVal 0&))
         End If
+        TaskDialogTabHookRemove Me
         RaiseEvent DialogDestroyed
         m_TDhWnd = 0
 End Select
@@ -2442,7 +2531,7 @@ If m_HasCustomButtons Then
     uTDC.cButtons = UBound(m_uButtons) + 1
     ReDim m_uButtons_VBA7(UBound(m_uButtons))
     For p = 0 To UBound(m_uButtons)
-    	CopyMemory m_uButtons_VBA7(p).data(0), m_uButtons(p).nButtonID, 4
+        CopyMemory m_uButtons_VBA7(p).data(0), m_uButtons(p).nButtonID, 4
         CopyMemory m_uButtons_VBA7(p).data(4), m_uButtons(p).pszButtonText, 8
     Next
 Else
@@ -2493,6 +2582,7 @@ uTDC.pfCallback = tdFARPROC(AddressOf TaskDialogCallbackProc)
 uTDC.lpCallbackData = ObjPtr(Me)
 sComboText = ""
 nComboIdx = -1
+ModalWindowsDisable
 
 If hActCtx <> INVALID_HANDLE_VALUE Then 'we need to activate comctl32.dll 6.0
     Dim lActCtxCookie As LongPtr
@@ -2513,6 +2603,7 @@ hr = TaskDialogIndirect(uTDC, pnButton, pnRadButton, pfVerify)
 If hActCtx <> INVALID_HANDLE_VALUE Then
     DeactivateActCtx 0, lActCtxCookie 'Deactivate, because we don't want to interfere with the rest of the app
 End If
+ModalWindowsEnable 'normally done already, at TDN_BUTTON_CLICKED
 Dim sErr As String
 'Call GetLastError_Msg(hr, , sErr)
 DebugAppend "TaskDialogIndirect ret=0x" & Hex$(hr) & ": LastErr=0x" & Err.LastDllError
@@ -2609,6 +2700,7 @@ End Sub
 Public Sub Init()
 'resets the entire module
 mPageIndex = 0
+m_nModalTo = 0
 hLogoImage = 0
 nLogoPos = 0
 nLogoType = 0
@@ -2696,6 +2788,8 @@ lSliderChangeL = 2
 nSliderTickStyle = 0
 nBreaksAdded = 0
 mPassChar = 9679 'Dot
+Erase m_hModalTo
+m_nModalOff = 0
 
 With uTDC
     .CXWidth = 0
@@ -2746,6 +2840,40 @@ With uTDC
 End With
 bEditPassword = False
 bEditFooter = False
+End Sub
+
+Public Sub AddModalWindow(ByVal hWnd As LongPtr)
+'Adds a window to disable while the dialog is shown, besides .ParenthWnd, which TaskDialog
+'disables itself. Add all your forms to block them all, like MsgBox. Init clears the list.
+ReDim Preserve m_hModalTo(m_nModalTo)
+m_hModalTo(m_nModalTo) = hWnd
+m_nModalTo = m_nModalTo + 1
+End Sub
+
+Private Sub ModalWindowsDisable()
+'ShowDialog: disables AddModalWindow's windows, except the parent and any already disabled.
+Dim i As Long
+m_nModalOff = 0
+For i = 0 To m_nModalTo - 1
+    If (m_hModalTo(i) <> uTDC.hWndParent) And (IsWindowEnabled(m_hModalTo(i)) <> 0) Then
+        EnableWindow m_hModalTo(i), 0
+        ReDim Preserve m_hModalOff(m_nModalOff)
+        m_hModalOff(m_nModalOff) = m_hModalTo(i)
+        m_nModalOff = m_nModalOff + 1
+    End If
+Next i
+End Sub
+
+Private Sub ModalWindowsEnable()
+'Enables what ModalWindowsDisable disabled. TDN_BUTTON_CLICKED calls this as the dialog is about
+'to close, before TaskDialog hides it, so with no parent Windows can give activation back to one
+'of them instead of another app. ShowDialog calls it again after the dialog returns, for a dialog
+'that closed some other way or from a page navigated to; only the first call does anything.
+Dim i As Long
+For i = 0 To m_nModalOff - 1
+    EnableWindow m_hModalOff(i), 1
+Next i
+m_nModalOff = 0
 End Sub
 
 Public Sub CloseDialog()
@@ -3059,7 +3187,7 @@ Dim lRet As Long
 nci.cbSize = LenB(nci)
 lRet = SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, LenB(nci), nci, 0)
 If lRet Then
-	nci.lfMessageFont.LFHeight = -((9 * dpi) / 72)
+    nci.lfMessageFont.LFHeight = -((9 * dpi) / 72)
     m_hFontDisp = CreateFontIndirectW(nci.lfMessageFont)
 End If
 If m_hFontDisp = 0 Then m_hFontDisp = GetStockObject(DEFAULT_GUI_FONT) 'fallback
@@ -3067,7 +3195,7 @@ Dim sMinMaxEffect As String
 sMinMaxEffect = GetRegistryValueW(HKEY_CURRENT_USER, "Control Panel\Desktop\WindowMetrics", "MinAnimate")
 If sMinMaxEffect = "1" Then
     mMinMaxEffectEnabled = True
-	nTmrDelay = 5
+    nTmrDelay = 5
 Else
     nTmrDelay = 0
 End If
@@ -3316,6 +3444,7 @@ End With
 'Copy all user-set data from the new TD into this one, since it takes over
 
     
+    TaskDialogTabHookRemove Me 'cTD gets TDN_NAVIGATED/TDN_DESTROYED from here on; this instance never sees TDN_DESTROYED
     #If (VBA7 <> 0) And (TWINBASIC = 0) And (Win64 <> 0) Then
     Call SendMessageW(m_TDhWnd, TDM_NAVIGATE_PAGE, 0, uTDC2_VBA7)
     #Else
@@ -4000,256 +4129,87 @@ Public Function zzGetWindowsButtonIconSize() As Long
 zzGetWindowsButtonIconSize = m_BtnLRSize
 End Function
 Private Function SetButtonIcons() As Boolean
-Dim i As Long, J As Long, k As Long
-Dim lOffset As Long
-Dim hButton As LongPtr
-Dim stay As Boolean
-Dim hIco As LongPtr
+'Puts the icons on the custom and common buttons, and makes the split button. TaskDialog's Button
+'windows have no control IDs, so they're matched by order: m_hButton has them in the order
+'TaskDialog creates them, which is the custom buttons in pButtons order, then the common buttons
+'in the order of vFlag below (read from a dialog with all eleven). The radio buttons are Button windows too,
+'and where they fall depends on the flags, so they're skipped wherever they are.
+Dim hBtn() As LongPtr, nBtn As Long
+Dim vFlag As Variant, vSlot As Variant, vName As Variant
+Dim i As Long, k As Long
+Dim bAny As Boolean
 
 On Error Resume Next
 
-If m_HasRadioButtons Then
-    lOffset = UBound(m_uRadioButtons) '+ 1
-End If
-If (m_HasRadioButtons = True) And ((uTDC.dwFlags And TDF_USE_COMMAND_LINKS) = TDF_USE_COMMAND_LINKS) Then
-    lOffset = 0
-End If
-
 If m_HasCustomButtons Then
-    For i = 0 To UBound(icoDataC)
-        hButton = m_hButton(i + lOffset)
-        If icoDataC(i) Then
-            If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-                hIco = LoadImage(hShell32, icoDataC(i), 1, m_BtnLRSize, m_BtnLRSize, 0)
-                Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-                Call DestroyIcon(hIco)
-            ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-                hIco = LoadImage(hImageRes, icoDataC(i), 1, m_BtnLRSize, m_BtnLRSize, 0)
-                Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-                Call DestroyIcon(hIco)
-            Else
-                hIco = icoDataC(i)
-                Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            End If
-
-        End If
-        If m_uButtons(i).nButtonID = nSplitButtonID Then
-            Call Subclass2(hButton, AddressOf TaskDialogSubclassProc, m_TDhWnd, ObjPtr(Me))
-'                SetParent hButton, m_TDhWnd
-            MakeSplitButton hButton
-        End If
+    For i = 0 To UBound(m_uButtons)
+        If (icoDataC(i) <> 0) Or (m_uButtons(i).nButtonID = nSplitButtonID) Then bAny = True
     Next i
-    J = UBound(m_uButtons) + 1
 End If
+If uTDC.dwCommonButtons <> 0 Then
+    For i = 0 To 10
+        If icoDataN(i) <> 0 Then bAny = True
+    Next i
+End If
+If bAny = False Then Exit Function
 
-For i = 0 To 10
-    If icoDataN(i) Then
-        stay = True
+ReDim hBtn(UBound(m_hButton))
+For i = 0 To UBound(m_hButton)
+    If m_hButton(i) <> 0 Then
+        If IsRadioBtn(m_hButton(i)) = False Then
+            hBtn(nBtn) = m_hButton(i)
+            nBtn = nBtn + 1
+        End If
     End If
 Next i
-If (stay = False) Or (uTDC.dwCommonButtons = 0) Then Exit Function
-i = 0
-If (uTDC.dwCommonButtons And TDCBF_OK_BUTTON) Then
-    hButton = m_hButton(J + lOffset)
-    If icoDataN(0) Then
-            If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-                hIco = LoadImage(hShell32, icoDataN(0), 1, m_BtnLRSize, m_BtnLRSize, 0)
-                Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-                Call DestroyIcon(hIco)
-            ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-                hIco = LoadImage(hImageRes, icoDataN(0), 1, m_BtnLRSize, m_BtnLRSize, 0)
-                Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-                Call DestroyIcon(hIco)
-            Else
-                hIco = icoDataN(0)
-                Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+
+If m_HasCustomButtons Then
+    For i = 0 To UBound(m_uButtons)
+        If i < nBtn Then
+            DebugAppend "[Icons] " & FocusDesc(hBtn(i)) & " matched to custom button " & m_uButtons(i).nButtonID
+            If icoDataC(i) Then ApplyButtonIcon hBtn(i), icoDataC(i)
+            If m_uButtons(i).nButtonID = nSplitButtonID Then
+                Call Subclass2(hBtn(i), AddressOf TaskDialogSubclassProc, m_TDhWnd, ObjPtr(Me))
+'                SetParent hBtn(i), m_TDhWnd
+                MakeSplitButton hBtn(i)
             End If
-'        Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal icoDataN(0))
-    End If
-    k = k + 1
-End If
-If (uTDC.dwCommonButtons And TDCBF_YES_BUTTON) Then
-    hButton = m_hButton(J + lOffset + k)
-    If icoDataN(1) Then
-        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-            hIco = LoadImage(hShell32, icoDataN(1), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-            hIco = LoadImage(hImageRes, icoDataN(1), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        Else
-            hIco = icoDataN(1)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
         End If
-    End If
-    k = k + 1
-End If
-If (uTDC.dwCommonButtons And TDCBF_NO_BUTTON) Then
-    hButton = m_hButton(J + lOffset + k)
-    If icoDataN(2) Then
-        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-            hIco = LoadImage(hShell32, icoDataN(2), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-            hIco = LoadImage(hImageRes, icoDataN(2), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        Else
-            hIco = icoDataN(2)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-        End If
-    End If
-    k = k + 1
-End If
-If (uTDC.dwCommonButtons And TDCBF_CANCEL_BUTTON) Then
-    hButton = m_hButton(J + lOffset + k)
-    If icoDataN(3) Then
-        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-            hIco = LoadImage(hShell32, icoDataN(3), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-            hIco = LoadImage(hImageRes, icoDataN(3), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        Else
-            hIco = icoDataN(3)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-        End If
-    End If
-    k = k + 1
-End If
-If (uTDC.dwCommonButtons And TDCBF_RETRY_BUTTON) Then
-    hButton = m_hButton(J + lOffset + k)
-    If icoDataN(4) Then
-        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-            hIco = LoadImage(hShell32, icoDataN(4), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-            hIco = LoadImage(hImageRes, icoDataN(4), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        Else
-            hIco = icoDataN(4)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-        End If
-    End If
-    k = k + 1
-End If
-If (uTDC.dwCommonButtons And TDCBF_CLOSE_BUTTON) Then
-    hButton = m_hButton(J + lOffset + k)
-    If icoDataN(5) Then
-        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-            hIco = LoadImage(hShell32, icoDataN(5), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-            hIco = LoadImage(hImageRes, icoDataN(5), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        Else
-            hIco = icoDataN(5)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-        End If
-    End If
-    k = k + 1
-End If
-If (uTDC.dwCommonButtons And TDCBF_ABORT_BUTTON) Then
-    hButton = m_hButton(J + lOffset + k)
-    If icoDataN(6) Then
-        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-            hIco = LoadImage(hShell32, icoDataN(6), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-            hIco = LoadImage(hImageRes, icoDataN(6), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        Else
-            hIco = icoDataN(6)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-        End If
-    End If
-    k = k + 1
-End If
-If (uTDC.dwCommonButtons And TDCBF_IGNORE_BUTTON) Then
-    hButton = m_hButton(J + lOffset + k)
-    If icoDataN(7) Then
-        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-            hIco = LoadImage(hShell32, icoDataN(7), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-            hIco = LoadImage(hImageRes, icoDataN(7), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        Else
-            hIco = icoDataN(7)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-        End If
-    End If
-    k = k + 1
-End If
-If (uTDC.dwCommonButtons And TDCBF_TRYAGAIN_BUTTON) Then
-    hButton = m_hButton(J + lOffset + k)
-    If icoDataN(8) Then
-        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-            hIco = LoadImage(hShell32, icoDataN(8), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-            hIco = LoadImage(hImageRes, icoDataN(8), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        Else
-            hIco = icoDataN(8)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-        End If
-    End If
-    k = k + 1
-End If
-If (uTDC.dwCommonButtons And TDCBF_CONTINUE_BUTTON) Then
-    hButton = m_hButton(J + lOffset + k)
-    If icoDataN(9) Then
-        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-            hIco = LoadImage(hShell32, icoDataN(9), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-            hIco = LoadImage(hImageRes, icoDataN(9), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        Else
-            hIco = icoDataN(9)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-        End If
-    End If
-    k = k + 1
-End If
-If (uTDC.dwCommonButtons And TDCBF_HELP_BUTTON) Then
-    hButton = m_hButton(J + lOffset + k)
-    If icoDataN(10) Then
-        If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
-            hIco = LoadImage(hShell32, icoDataN(10), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
-            hIco = LoadImage(hImageRes, icoDataN(10), 1, m_BtnLRSize, m_BtnLRSize, 0)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-            Call DestroyIcon(hIco)
-        Else
-            hIco = icoDataN(10)
-            Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
-        End If
-    End If
-    k = k + 1
+    Next i
+    k = UBound(m_uButtons) + 1
 End If
 
+vFlag = Array(TDCBF_OK_BUTTON, TDCBF_YES_BUTTON, TDCBF_NO_BUTTON, TDCBF_ABORT_BUTTON, TDCBF_RETRY_BUTTON, TDCBF_CANCEL_BUTTON, _
+              TDCBF_IGNORE_BUTTON, TDCBF_TRYAGAIN_BUTTON, TDCBF_CONTINUE_BUTTON, TDCBF_CLOSE_BUTTON, TDCBF_HELP_BUTTON)
+vSlot = Array(0, 1, 2, 6, 4, 3, 7, 8, 9, 5, 10) 'where each one's icon is in icoDataN (see SetCommonButtonIcon)
+vName = Array("OK", "Yes", "No", "Abort", "Retry", "Cancel", "Ignore", "Try Again", "Continue", "Close", "Help")
+For i = LBound(vFlag) To UBound(vFlag)
+    If (uTDC.dwCommonButtons And vFlag(i)) <> 0 Then
+        If k < nBtn Then
+            DebugAppend "[Icons] " & FocusDesc(hBtn(k)) & " matched to " & vName(i)
+            If icoDataN(vSlot(i)) Then ApplyButtonIcon hBtn(k), icoDataN(vSlot(i))
+        End If
+        k = k + 1
+    End If
+Next i
+If k <> nBtn Then DebugAppend "[Icons] expected " & k & " buttons besides the radio buttons, found " & nBtn
 End Function
+
+Private Sub ApplyButtonIcon(ByVal hButton As LongPtr, ByVal hIcon As LongPtr)
+'hIcon is an HICON, or an icon ID in shell32 or imageres with TDF_USE_SHELL32_ICONID_BUTTON or
+'TDF_USE_IMAGERES_ICONID_BUTTON.
+Dim hIco As LongPtr
+If (uTDC.dwFlags And TDF_USE_SHELL32_ICONID_BUTTON) = TDF_USE_SHELL32_ICONID_BUTTON Then
+    hIco = LoadImage(hShell32, hIcon, 1, m_BtnLRSize, m_BtnLRSize, 0)
+    Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+    Call DestroyIcon(hIco)
+ElseIf (uTDC.dwFlags And TDF_USE_IMAGERES_ICONID_BUTTON) = TDF_USE_IMAGERES_ICONID_BUTTON Then
+    hIco = LoadImage(hImageRes, hIcon, 1, m_BtnLRSize, m_BtnLRSize, 0)
+    Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIco)
+    Call DestroyIcon(hIco)
+Else
+    Call SendMessageW(hButton, BM_SETIMAGE, 1, ByVal hIcon)
+End If
+End Sub
 Private Sub InputReposition()
 If hEditBox Then
         Dim tRC As RECT
@@ -5024,6 +4984,10 @@ Select Case uMsg
                     RaiseEvent DateTimeChange(DateTimeValue, DateTimeChecked)
             End Select
 
+    Case WM_SETFOCUS
+        zz_ProcessSubclass = DefSubclassProc(lng_hWnd, uMsg, wParam, lParam)
+        If m_bOwnFocusMove = False Then BackTabFocusArrived lng_hWnd
+        Exit Function
     Case WM_DESTROY
       ' OLDWNDPROC will be gone after UnSubClass is called!
       Call UnSubclass2(lng_hWnd, PtrTDWndProc, uIdSubclass)
@@ -5040,6 +5004,386 @@ DebugAppend "ProcessSubclass Error=" & Err.Description
 End Function
 Private Function PtrTDWndProc() As LongPtr
     PtrTDWndProc = tdFARPROC(AddressOf TaskDialogSubclassProc)
+End Function
+
+'---------------------------------------------------------------------------------------------
+'Keyboard navigation for the controls this class adds.
+'DirectUI resolves Tab/Shift+Tab among TaskDialog's own elements: its buttons, which are real
+'windows (each in a CtrlNotifySink), and others that aren't Button windows we can find, like
+'the expando button and the verification checkbox. Our controls are bare children of the
+'DirectUIHWND, so DirectUI never moves focus onto them. The WH_GETMESSAGE hook in mTDHelper
+'hands every message here before the dialog's message loop sees it.
+'Each run of our controls is slotted into DirectUI's order right after the TaskDialog button
+'that precedes it in reading order (its anchor). Only the moves at the edges of a run are ours;
+'the rest stays DirectUI's call, since it may involve elements we can't see:
+' - Tab on an anchor goes to the first control of its run, Tab/Shift+Tab inside a run moves
+'   along it, and Shift+Tab from the first goes back to the anchor. We do these ourselves and
+'   swallow the Tab.
+' - Tab from the last control of a run is re-aimed at the anchor: we focus the anchor and let
+'   the Tab through as if it had been pressed there, so DirectUI moves on from the anchor.
+' - Every other Tab is let through.
+'DirectUI doesn't move focus while the Tab is dispatched but some time later, starting from
+'whatever has focus by then, so nothing of ours may move focus in between. After a Shift+Tab we
+'let through, our subclass on TaskDialog's buttons and the DirectUIHWND sees focus arrive
+'(BackTabFocusArrived) and posts a WM_TDTABCHECK; if DirectUI put focus on an anchor, AfterBackTab
+'moves on to the last control of its run. Focus arriving counts as DirectUI's move for that
+'Shift+Tab while the Shift+Tab is still pending (new input other than a modifier key ends that),
+'or while Shift and Tab are both still down.
+'---------------------------------------------------------------------------------------------
+Public Function zz_ProcessGetMsg(ByVal lpMsg As LongPtr) As Long
+Attribute zz_ProcessGetMsg.VB_MemberFlags = "400"
+'***DO NOT CALL THIS FUNCTION*** lpMsg is the hook's MSG*. Returns nonzero when the message was this dialog's (the hook stops looking).
+Dim tMsg As MSG
+Dim tStops() As TDTabStop, nStops As Long
+Dim iCur As Long, iNext As Long, iAnchor As Long
+Dim bBack As Boolean, bSwallow As Boolean
+Dim sFrom As String
+On Error GoTo e0
+If (m_TDhWnd = 0) Or (hUI = 0) Then Exit Function
+CopyMemory tMsg, ByVal lpMsg, LenB(tMsg)
+
+Select Case tMsg.message
+    Case WM_TDTABCHECK 'posted by PostTabCheck
+        If (tMsg.hWnd <> m_TDhWnd) Or (tMsg.lParam <> ObjPtr(Me)) Then Exit Function
+        zz_ProcessGetMsg = 1
+        tMsg.message = WM_NULL
+        CopyMemory ByVal lpMsg, tMsg, LenB(tMsg)
+        AfterBackTab
+        Exit Function
+    Case WM_KEYDOWN, WM_SYSKEYDOWN, WM_LBUTTONDOWN, WM_RBUTTONDOWN, WM_MBUTTONDOWN
+        'New input ends the wait for DirectUI's move after a Shift+Tab. A modifier key going down
+        'doesn't: some keyboards and input tools send one in the middle of a Shift+Tab.
+        If m_bBackTabPending Then
+            If IsModifierKeyDown(tMsg) Then
+                TabLog "  modifier key-down while waiting for DirectUI: key &H" & Hex$(tMsg.wParam)
+            Else
+                m_bBackTabPending = False
+                TabLog "  stopped waiting for DirectUI: message &H" & Hex$(tMsg.message) & ", wParam &H" & Hex$(tMsg.wParam)
+            End If
+        End If
+        If (tMsg.message <> WM_KEYDOWN) Or (tMsg.wParam <> VK_TAB) Then Exit Function
+    Case Else
+        Exit Function
+End Select
+If IsChild(m_TDhWnd, tMsg.hWnd) = 0 Then Exit Function
+zz_ProcessGetMsg = 1
+If (GetKeyState(VK_CONTROL) < 0) Or (GetKeyState(VK_MENU) < 0) Then Exit Function
+bBack = (GetKeyState(VK_SHIFT) < 0)
+
+nStops = GetTabStops(tStops)
+TabLogStops tStops, nStops
+iCur = FindTabStop(tStops, nStops, GetFocus())
+If (iCur >= 0) And (nStops > 1) Then
+    If bBack Then iNext = (iCur + nStops - 1) Mod nStops Else iNext = (iCur + 1) Mod nStops
+End If
+If bBack Then sFrom = "Shift+Tab on " Else sFrom = "Tab on "
+sFrom = sFrom & FocusDesc(GetFocus())
+
+If (iCur < 0) Or (nStops < 2) Then
+    'Focus is on something only DirectUI knows about (expando, verification checkbox, ...).
+    LetTabThrough bBack, sFrom
+ElseIf tStops(iCur).nKind <> TS_OURS Then
+    If (tStops(iNext).nKind = TS_OURS) And ((Not bBack) Or DirectUIHasOneStop(tStops, nStops)) Then
+        'Tab from an anchor into its run. Or Shift+Tab on the one element DirectUI has, which
+        'DirectUI wouldn't move from: the last control of the run anchored there is next.
+        TabLog sFrom & ": to " & FocusDesc(tStops(iNext).hWnd)
+        FocusTabStop tStops(iNext)
+        bSwallow = True
+    Else
+        LetTabThrough bBack, sFrom 'from one of TaskDialog's buttons: DirectUI's move
+    End If
+ElseIf bBack Or (tStops(iNext).nKind = TS_OURS) Then
+    'Inside a run, or Shift+Tab from its first control back to the anchor.
+    TabLog sFrom & ": to " & FocusDesc(tStops(iNext).hWnd)
+    FocusTabStop tStops(iNext)
+    bSwallow = True
+Else
+    'Tab off the end of a run: re-aim it at the anchor.
+    iAnchor = iCur
+    Do While tStops(iAnchor).nKind = TS_OURS
+        iAnchor = (iAnchor + nStops - 1) Mod nStops
+    Loop
+    If tStops(iAnchor).nKind = TS_RADIOS Then
+        If SendMessageW(tStops(iAnchor).hWnd, BM_GETCHECK, 0&, ByVal 0&) <> BST_CHECKED Then iAnchor = -1 'focusing an unchecked radio button can select it
+    End If
+    If iAnchor < 0 Then
+        TabLog sFrom & ": to " & FocusDesc(tStops(iNext).hWnd) & " (no radio button checked)"
+        FocusTabStop tStops(iNext) 'skip DirectUI this time
+        bSwallow = True
+    Else
+        TabLog sFrom & ": re-aimed at " & FocusDesc(tStops(iAnchor).hWnd)
+        SendMessageW m_TDhWnd, WM_CHANGEUISTATE, UIS_CLEAR_HIDEFOCUS, ByVal 0&
+        m_bOwnFocusMove = True
+        SetFocusAPI tStops(iAnchor).hWnd
+        m_bOwnFocusMove = False
+        tMsg.hWnd = tStops(iAnchor).hWnd 'let the Tab through as if pressed on the anchor
+        CopyMemory ByVal lpMsg, tMsg, LenB(tMsg)
+    End If
+End If
+
+If bSwallow Then
+    tMsg.message = WM_NULL 'the dialog's loop gets WM_NULL instead of the Tab
+    CopyMemory ByVal lpMsg, tMsg, LenB(tMsg)
+End If
+Exit Function
+e0:
+DebugAppend "zz_ProcessGetMsg error: " & Err.Description
+End Function
+
+Private Sub BackTabFocusArrived(ByVal hWnd As LongPtr)
+'WM_SETFOCUS on one of TaskDialog's buttons or the DirectUIHWND that we didn't cause. If it's DirectUI
+'moving focus for a Shift+Tab we let through, check where it lands once DirectUI is done.
+If m_bBackTabPending Or ((GetKeyState(VK_SHIFT) < 0) And (GetKeyState(VK_TAB) < 0)) Then
+    TabLog "  focus arrived on " & FocusDesc(hWnd) & "; checking where DirectUI put it"
+    PostTabCheck
+Else
+    TabLog "  focus arrived on " & FocusDesc(hWnd) & "; no Shift+Tab pending"
+End If
+End Sub
+
+Private Sub AfterBackTab()
+'Runs after BackTabFocusArrived, once DirectUI is done moving focus. If DirectUI put it on an
+'anchor, the last control of its run comes first.
+Dim tStops() As TDTabStop, nStops As Long
+Dim iCur As Long, i As Long, hFocus As LongPtr
+hFocus = GetFocus()
+TabLog "  DirectUI put focus on " & FocusDesc(hFocus)
+If hFocus = m_hBackTabFrom Then Exit Sub 'not moved on from where the Shift+Tab started
+m_bBackTabPending = False
+nStops = GetTabStops(tStops)
+iCur = FindTabStop(tStops, nStops, hFocus)
+If iCur < 0 Then Exit Sub
+If tStops(iCur).nKind = TS_OURS Then Exit Sub
+i = iCur 'move i to the last control of the run anchored here, if there is one
+Do While tStops((i + 1) Mod nStops).nKind = TS_OURS
+    i = (i + 1) Mod nStops
+Loop
+If i <> iCur Then
+    TabLog "  that's an anchor; going to " & FocusDesc(tStops(i).hWnd)
+    FocusTabStop tStops(i)
+End If
+End Sub
+
+Private Function IsModifierKeyDown(tMsg As MSG) As Boolean
+If (tMsg.message <> WM_KEYDOWN) And (tMsg.message <> WM_SYSKEYDOWN) Then Exit Function
+Select Case CLng(tMsg.wParam)
+    Case VK_SHIFT, VK_CONTROL, VK_MENU, VK_LWIN, VK_RWIN, VK_LSHIFT To VK_RMENU
+        IsModifierKeyDown = True
+End Select
+End Function
+
+Private Function DirectUIHasOneStop(tStops() As TDTabStop, ByVal nStops As Long) As Boolean
+'True when one button is all DirectUI has to move between: no expando, no verification checkbox,
+'no links, and no other enabled button.
+Dim i As Long, n As Long
+If (m_sExpandedInfo <> "") Or (m_sVerify <> "") Then Exit Function
+If (uTDC.dwFlags And TDF_ENABLE_HYPERLINKS) <> 0 Then
+    If InStr(1, m_sContent & m_sFooter, "<a", vbTextCompare) > 0 Then Exit Function 'links are DirectUI elements too
+End If
+For i = 0 To nStops - 1
+    If tStops(i).nKind <> TS_OURS Then n = n + 1
+Next i
+DirectUIHasOneStop = (n = 1)
+End Function
+
+Private Sub StartTabSupport()
+'Tab/Shift+Tab into the added controls: the thread hook (zz_ProcessGetMsg), plus our subclass on
+'TaskDialog's buttons, so we see when DirectUI focuses one of them (zz_ProcessSubclass).
+Dim i As Long
+m_bBackTabPending = False
+For i = 0 To UBound(m_hButton)
+    If m_hButton(i) <> 0 Then Subclass2 m_hButton(i), AddressOf TaskDialogSubclassProc, m_TDhWnd, ObjPtr(Me)
+Next i
+TaskDialogTabHookAdd Me
+End Sub
+
+Private Sub FocusTabStop(tStop As TDTabStop)
+Dim hFocus As LongPtr
+SendMessageW m_TDhWnd, WM_CHANGEUISTATE, UIS_CLEAR_HIDEFOCUS, ByVal 0& 'keyboard navigation: make sure focus cues show
+m_bOwnFocusMove = True
+SetFocusAPI tStop.hWnd
+m_bOwnFocusMove = False
+hFocus = GetFocus()
+If (SendMessageW(hFocus, WM_GETDLGCODE, 0&, ByVal 0&) And DLGC_HASSETSEL) <> 0 Then
+    SendMessageW hFocus, EM_SETSEL, 0&, ByVal (-1&) 'select all on tab-in, like a normal dialog
+End If
+End Sub
+
+Private Sub PostTabCheck()
+'Queues a WM_TDTABCHECK for zz_ProcessGetMsg, so AfterBackTab runs once whatever is moving focus
+'right now has finished.
+PostMessageW m_TDhWnd, WM_TDTABCHECK, 0, ObjPtr(Me)
+End Sub
+
+Private Sub LetTabThrough(ByVal bBack As Boolean, sFrom As String)
+TabLog sFrom & ": left to DirectUI"
+If bBack Then
+    m_bBackTabPending = True 'see BackTabFocusArrived
+    m_hBackTabFrom = GetFocus()
+End If
+End Sub
+
+Private Sub TabLog(ByVal sMsg As String)
+DebugAppend "[Tab] " & sMsg 'shows when useropt_dbg_PrintToImmediate = True
+End Sub
+
+Private Sub TabLogStops(tStops() As TDTabStop, ByVal nStops As Long)
+Dim s As String, i As Long
+If useropt_dbg_PrintToImmediate = False Then Exit Sub
+For i = 0 To nStops - 1
+    If i > 0 Then s = s & " | "
+    If tStops(i).nKind = TS_RADIOS Then s = s & "radio buttons" Else s = s & FocusDesc(tStops(i).hWnd)
+Next i
+If s <> m_sTabStopsLogged Then
+    m_sTabStopsLogged = s
+    TabLog "stops in reading order: " & s
+End If
+End Sub
+
+Private Function FocusDesc(ByVal hWnd As LongPtr) As String
+'Names a window for the [Tab] debug log.
+Dim sText As String, nLen As Long
+If useropt_dbg_PrintToImmediate = False Then Exit Function 'nobody will read it
+If hWnd = 0 Then
+    FocusDesc = "nothing"
+ElseIf hWnd = hUI Then
+    FocusDesc = "DirectUIHWND (an element with no window)"
+ElseIf (hWnd = hEditBox) Or (IsChild(hEditBox, hWnd) <> 0) Then
+    FocusDesc = "input box"
+ElseIf (hWnd = hCombo) Or (IsChild(hCombo, hWnd) <> 0) Then
+    FocusDesc = "combo box"
+ElseIf (hWnd = hDateTime) Or (IsChild(hDateTime, hWnd) <> 0) Then
+    FocusDesc = "date/time picker"
+ElseIf (hWnd = hDateTime2) Or (IsChild(hDateTime2, hWnd) <> 0) Then
+    FocusDesc = "second date/time picker"
+ElseIf hWnd = hSlider Then
+    FocusDesc = "slider"
+Else
+    nLen = CLng(SendMessageW(hWnd, WM_GETTEXTLENGTH, 0&, ByVal 0&))
+    sText = String$(nLen + 1, vbNullChar)
+    nLen = CLng(SendMessageW(hWnd, WM_GETTEXT, nLen + 1, ByVal StrPtr(sText)))
+    FocusDesc = WndClass(hWnd) & " " & Chr$(34) & Left$(sText, nLen) & Chr$(34)
+End If
+End Function
+
+Private Function GetTabStops(tStops() As TDTabStop) As Long
+'TaskDialog's Button windows and our controls, enabled and visible, in reading order. The radio
+'buttons count as one stop, entered at the checked one. DirectUI's other elements aren't here.
+Dim h As LongPtr, hRadTop As LongPtr, hRadChk As LongPtr
+Dim rc As RECT, rcRad As RECT, tTmp As TDTabStop
+Dim n As Long, i As Long, j As Long
+Dim bSkipKids As Boolean, bRTL As Boolean
+ReDim tStops(15)
+h = GetWindow(hUI, GW_CHILD)
+Do While h
+    bSkipKids = False
+    If (h = hEditBox) Or (h = hCombo) Or (h = hDateTime) Or (h = hDateTime2) Or (h = hSlider) Then
+        bSkipKids = True
+        If (IsWindowVisible(h) <> 0) And (IsWindowEnabled(h) <> 0) Then
+            'a ComboBoxEx's own rect can include the dropdown height; its combo's rect doesn't
+            If (h = hCombo) And (hComboCombo <> 0) Then GetWindowRect hComboCombo, rc Else GetWindowRect h, rc
+            AddTabStop tStops, n, h, TS_OURS, rc
+        End If
+    ElseIf WndClass(h) = "Button" Then
+        bSkipKids = True
+        If (IsWindowVisible(h) <> 0) And (IsWindowEnabled(h) <> 0) Then
+            GetWindowRect h, rc
+            If IsRadioBtn(h) Then
+                If hRadTop = 0 Then
+                    hRadTop = h: rcRad = rc
+                Else
+                    If rc.Top < rcRad.Top Then hRadTop = h: rcRad.Top = rc.Top
+                    If rc.Bottom > rcRad.Bottom Then rcRad.Bottom = rc.Bottom
+                    If rc.Left < rcRad.Left Then rcRad.Left = rc.Left
+                    If rc.Right > rcRad.Right Then rcRad.Right = rc.Right
+                End If
+                If SendMessageW(h, BM_GETCHECK, 0&, ByVal 0&) = BST_CHECKED Then hRadChk = h
+            Else
+                AddTabStop tStops, n, h, TS_NATIVE, rc
+            End If
+        End If
+    End If
+    h = NextDescendant(h, bSkipKids)
+Loop
+If hRadTop Then
+    If hRadChk = 0 Then hRadChk = hRadTop
+    AddTabStop tStops, n, hRadChk, TS_RADIOS, rcRad
+End If
+
+bRTL = (GetWindowLong(m_TDhWnd, GWL_EXSTYLE) And WS_EX_LAYOUTRTL) <> 0
+For i = 1 To n - 1 'insertion sort; there are only a handful
+    tTmp = tStops(i)
+    j = i - 1
+    Do While j >= 0
+        If Not TabStopPrecedes(tTmp.rc, tStops(j).rc, bRTL) Then Exit Do
+        tStops(j + 1) = tStops(j)
+        j = j - 1
+    Loop
+    tStops(j + 1) = tTmp
+Next i
+GetTabStops = n
+End Function
+
+Private Sub AddTabStop(tStops() As TDTabStop, n As Long, ByVal hWnd As LongPtr, ByVal nKind As Long, rc As RECT)
+If n > UBound(tStops) Then ReDim Preserve tStops(n + 8)
+tStops(n).hWnd = hWnd
+tStops(n).nKind = nKind
+tStops(n).rc = rc
+n = n + 1
+End Sub
+
+Private Function FindTabStop(tStops() As TDTabStop, ByVal nStops As Long, ByVal hFocus As LongPtr) As Long
+Dim i As Long
+FindTabStop = -1
+If hFocus = 0 Then Exit Function
+For i = 0 To nStops - 1
+    If tStops(i).nKind = TS_RADIOS Then
+        If WndClass(hFocus) = "Button" Then
+            If IsRadioBtn(hFocus) Then FindTabStop = i: Exit Function
+        End If
+    ElseIf (tStops(i).hWnd = hFocus) Or (IsChild(tStops(i).hWnd, hFocus) <> 0) Then
+        FindTabStop = i: Exit Function
+    End If
+Next i
+End Function
+
+Private Function TabStopPrecedes(a As RECT, b As RECT, ByVal bRTL As Boolean) As Boolean
+'Reading order: rows top to bottom, then along the row in the dialog's reading direction.
+Dim cyA As Long, cyB As Long
+cyA = (a.Top + a.Bottom) \ 2
+cyB = (b.Top + b.Bottom) \ 2
+If (cyA >= b.Top) And (cyA < b.Bottom) And (cyB >= a.Top) And (cyB < a.Bottom) Then
+    If bRTL Then TabStopPrecedes = (a.Right > b.Right) Else TabStopPrecedes = (a.Left < b.Left)
+Else
+    TabStopPrecedes = (a.Top < b.Top)
+End If
+End Function
+
+Private Function NextDescendant(ByVal h As LongPtr, ByVal bSkipKids As Boolean) As LongPtr
+'Pre-order walk of everything under hUI; returns 0 when done.
+Dim hNext As LongPtr
+If bSkipKids = False Then
+    hNext = GetWindow(h, GW_CHILD)
+    If hNext Then NextDescendant = hNext: Exit Function
+End If
+Do While (h <> 0) And (h <> hUI)
+    hNext = GetWindow(h, GW_HWNDNEXT)
+    If hNext Then NextDescendant = hNext: Exit Function
+    h = GetParent(h)
+Loop
+End Function
+
+Private Function WndClass(ByVal hWnd As LongPtr) As String
+Dim sBuf As String, nLen As Long
+sBuf = Space$(64)
+nLen = GetClassName(hWnd, sBuf, 64)
+WndClass = Left$(sBuf, nLen)
+End Function
+
+Private Function IsRadioBtn(ByVal hWnd As LongPtr) As Boolean
+Dim lType As Long
+lType = CLng(GetWindowLong(hWnd, GWL_STYLE) And BS_TYPEMASK)
+IsRadioBtn = (lType = BS_RADIOBUTTON) Or (lType = BS_AUTORADIOBUTTON)
 End Function
 
 

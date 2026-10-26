@@ -1,0 +1,9 @@
+[Description("")]
+[FormDesignerId("49CFCC17-8C11-4418-9B61-98942599243F")]
+[PredeclaredId]
+Class MyForm
+
+	Sub New()
+	End Sub
+
+End Class

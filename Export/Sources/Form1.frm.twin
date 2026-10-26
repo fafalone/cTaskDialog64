@@ -304,8 +304,8 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .MainInstruction = "Duplicates"
         .Content = "If you want to exclude an Artists name from the search:" '& vbCrLf & vbCrLf
         .Flags = TDF_INPUT_BOX Or TDF_VERIFICATION_FLAG_CHECKED
-        .AddCustomButton 100, "Continue"
-        .CommonButtons = TDCBF_CANCEL_BUTTON
+         .AddCustomButton 100, "Continue"
+        .CommonButtons = TDCBF_CANCEL_BUTTON Or TDCBF_OK_BUTTON Or TDCBF_RETRY_BUTTON
         .IconMain = TD_INFORMATION_ICON
         .Title = "cTaskDialog Project"
         .InputText = "Enter Artist name here."
@@ -331,7 +331,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     	.Content = "Message text"
         .CommonButtons = TDCBF_ABORT_BUTTON Or TDCBF_IGNORE_BUTTON Or TDCBF_TRYAGAIN_BUTTON Or TDCBF_CONTINUE_BUTTON Or TDCBF_HELP_BUTTON
         .Flags = TDF_POSITION_RELATIVE_TO_WINDOW Or TDF_CAN_BE_MINIMIZED Or TDF_ALLOW_DIALOG_CANCELLATION
-        '.ParenthWnd = Me.hWnd
+        .ParenthWnd = Me.hWnd
         .ShowDialog
         'If .ResultMain = TD_OK Then
         	Debug.Print "You clicked " & .ResultMain
@@ -735,7 +735,9 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
     Private Sub Command32_Click()
     himlSys = GetSystemImagelist(SHGFI_SMALLICON)
     Dim hIconF As LongPtr
-    hIconF = IconToHICON(LoadResData("ICO_CLIP", "CUSTOM"), 16, 16)
+    hIconF = IconToHICON(LoadResData("ICO_CLIP", "CUSTOM"), 32, 32)
+    Dim hiconm As LongPtr
+    hiconm = ResIconToHICON("ICO_HEART", 32, 32)
         Dim hBmp As LongPtr
         Dim sImg As String
         sImg = App.Path & "\vbf.jpg"
@@ -745,7 +747,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .Init
         .MainInstruction = "Perform Event"
         .Content = "Pick action to perform. You can schedule execution for later or enter a custom label below."
-        .Flags = TDF_USE_COMMAND_LINKS Or TDF_COMBO_BOX Or TDF_DATETIME Or TDF_USE_HICON_FOOTER Or TDF_USE_SHELL32_ICONID Or TDF_KILL_SHIELD_ICON Or TDF_CAN_BE_MINIMIZED
+        .Flags = TDF_USE_COMMAND_LINKS Or TDF_COMBO_BOX Or TDF_DATETIME Or TDF_USE_HICON_FOOTER Or TDF_KILL_SHIELD_ICON Or TDF_CAN_BE_MINIMIZED
     '    .ExpandedControlText = "Expando ABCDEFGHIJKL" Or TDF_INPUT_BOX
     '    .ExpandedInfo = "Test"
         .DateTimeType = dttDateTimeWithCheckTimeOnly
@@ -864,7 +866,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .Init
         .MainInstruction = "Sliding on down"
         .Content = "Pick a number"
-        .Flags = TDF_SLIDER Or TDF_USE_COMMAND_LINKS
+        .Flags = TDF_SLIDER 'Or TDF_USE_COMMAND_LINKS
         .SliderSetRange 0, 100, 10
         .SliderSetChangeValues 10, 20
         .SliderTickStyle = SldTickStyleBoth
@@ -872,7 +874,8 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .SliderAlign = TDIBA_Content
         .ExpandedControlText = "ExpandMe"
         .ExpandedInfo = "Expanded"
-        .AddCustomButton 100, "CommandLink"
+        .VerifyText = "Verify"
+        ' .AddCustomButton 100, "CommandLink"
         .CommonButtons = TDCBF_OK_BUTTON Or TDCBF_CANCEL_BUTTON
         .IconMain = TD_INFORMATION_ICON
         .Title = "cTaskDialog Project"
@@ -1320,7 +1323,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .AddRadioButton 111, "Or maybe 2"
         .AddRadioButton 112, "super secret option"
         .Flags = TDF_SIZE_TO_CONTENT
-        .Width = 50
+        ' .Width = 50
         .ShowDialog
     
         Label1.Caption = "ID of button clicked: " & .ResultMain
@@ -1358,8 +1361,8 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .Content = "Is is party time yet???"
         .Footer = "Don't you love TaskDialogIndirect?"
         .Flags = TDF_USE_HICON_MAIN Or TDF_USE_HICON_FOOTER
-        .IconMain = hIconM
-        .IconFooter = hIconF
+        .IconMain = hIconF
+        .IconFooter = hIconM
         .Title = "cTaskDialog Project"
         .CommonButtons = TDCBF_CLOSE_BUTTON
         
@@ -1379,7 +1382,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
         .Content = "We can really fit in a lot of organized information now."
         .Title = "cTaskDialog Project"
         .Footer = "Have some footer text."
-    '    .CollapsedControlText = "Click here for some more info."
+       .CollapsedControlText = "Click here for some more info."
         .ExpandedControlText = "Click again to hide that extra info."
         .ExpandedInfo = "Here's some more info we don't really need."
         .VerifyText = "Never ever show me this dialog again!"
@@ -1679,5 +1682,11 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
             TaskDialogPW.InputPasswordChar = 9679
         End If
     End Sub
+    
+    Private Sub Command45_Click() Handles Command45.Click
+        MyForm.Show
+    End Sub
+    
+ 
 
 End Class
