@@ -10,6 +10,7 @@ cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additiona
 - Added Tab/Shift+Tab navigation support for all custom controls.
 - Added method AddModalWindow, to disable interaction with other hwnds besides the immediate parent (you must still specify .ParentHwnd to be modal to that window). It wasn't practical to add an automatic 'app modal' option that wasn't insane/unstable across VB6, tB, and VBA.
 - More generalized fix for button icon order issue, as it occurred in many other scenarios.
+- Demos: Updated included .res file to work with VB6 SP5; also architecture to * so if you import to tB 64bit will work without modifying it.
 
 **Update (v1.7.0, 20 Feb 2026):**
 - Add InputBoxMaxLength property to set maximum number of characters.
