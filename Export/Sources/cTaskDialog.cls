@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '************************************************************
-'cTaskDialog v1.8 Universal Compatibility Version
+'cTaskDialog v1.8.1 Universal Compatibility Version
 'by Jon Johnson (aka fafalone)
 'fafalone@gmail.com
 '
@@ -22,7 +22,7 @@ Option Explicit
 '
 'https://www.vbforums.com/showthread.php?777021
 '
-'Released 26 October 2026
+'Released 30 October 2026
 '************************************************************
 '
 '
@@ -57,6 +57,13 @@ Option Explicit
 'VERSION HISTORY
 '
 '
+'Version 1.8.1
+'- Bug fix for custom controls disappearing if the same dialog is
+'  loaded twice in a multipage dialog. Note: Matching the behavior 
+'  of the native controls, content resets to initial load state when
+'  shown again. Use the Navigated event to restore changes after 
+'  saving them prior to loading a new page if you want to persist
+'  changes made by the user.
 'Version 1.8.0
 '- Added Tab/Shift+Tab navigation support for all custom controls.
 '- Added method AddModalWindow, to disable interaction with other hwnds
@@ -1145,11 +1152,13 @@ Private hSlider As LongPtr
 Private lSliderMin As Long
 Private lSliderMax As Long
 Private lSliderValue As Long
+Private lSliderInit As Long 'what the slider starts at; lSliderValue is its current/last value
 Private lSliderNTicks As Long
 Private lSliderChangeS As Long
 Private lSliderChangeL As Long
 Private hUI As LongPtr
 Private sEditText As String
+Private sEditInit As String 'what the input box starts with; sEditText is its current/last text
 Private sComboText As String
 Private nComboIdx As Long
 Private nComboNewIndex As Long
@@ -1172,6 +1181,7 @@ Private tDTCur As SYSTEMTIME
 Private tDTCur2 As SYSTEMTIME
 Private bDTCheck As Boolean
 Private bDTCheck2 As Boolean
+Private bDTCheckInit As Boolean, bDTCheck2Init As Boolean 'the date/time checkboxes' starting state; bDTCheck/bDTCheck2 are current/last
 Private lLastCY As Long
 Private nTmrCnt As Long
 Private nTmrDelay As Long
@@ -1414,6 +1424,7 @@ Select Case uNotification
         Call EnumChildWindows(hWnd, AddressOf TaskDialogEnumChildProc, ObjPtr(Me))
         SetButtonIcons
         SetInitialButtonStates
+        bPosUsed(0) = False: bPosUsed(1) = False: bPosUsed(2) = False 'a page shown again needs its controls again
         If (m_sExpandedInfo <> "") Then bPosUsed(1) = True 'expando control taking up the button position, so we can't add ours
         If (m_sVerify <> "") Then bPosUsed(1) = True 'same for verify
         If (uTDC.dwFlags And TDF_INPUT_BOX) Then AddInputBox: bSC = True
@@ -1551,6 +1562,7 @@ Select Case uNotification
         Call EnumChildWindows(hWnd, AddressOf TaskDialogEnumChildProc, ObjPtr(Me))
         SetButtonIcons
         SetInitialButtonStates
+        bPosUsed(0) = False: bPosUsed(1) = False: bPosUsed(2) = False 'a page shown again needs its controls again
         If (m_sExpandedInfo <> "") Then bPosUsed(1) = True 'expando control taking up the button position, so we can't add ours
         If (m_sVerify <> "") Then bPosUsed(1) = True 'same for verify
         If (uTDC.dwFlags And TDF_INPUT_BOX) Then AddInputBox: bSC = True
@@ -1567,54 +1579,75 @@ Select Case uNotification
         RaiseEvent Navigated
         Exit Function
     Case TDN_DESTROYED
-        If hEditBox Then
-            Dim lLen As Long, sText As String
-            lLen = CLng(SendMessageW(hEditBox, WM_GETTEXTLENGTH, 0, ByVal 0&) * 2)
-            If lLen Then
-                sText = Space$(lLen)
-                Call SendMessageW(hEditBox, WM_GETTEXT, lLen, ByVal sText)
-                sEditText = StrConv(sText, vbFromUnicode)
-            End If
-        End If
-        If hCombo Then
-            nComboIdx = CLng(SendMessageW(hCombo, CB_GETCURSEL, 0, ByVal 0&))
-            If nCbType = cbtDropdownList Then
-                If nComboIdx >= 0 Then
-                    sComboText = aComboItems(nComboIdx).sText
-                Else
-                    sComboText = ""
-                End If
-            Else
-                sComboText = GetComboTextW(hEditCombo)
-            End If
-        End If
-        Dim rs As Long
-        If hDateTime Then
-            rs = CLng(SendMessageW(hDateTime, DTM_GETSYSTEMTIME, 0&, tDTCur))
-            If rs = GDT_VALID Then
-                bDTCheck = True
-            Else
-                bDTCheck = False
-            End If
-            DebugAppend "TD_DESTROYED tDTCur=" & TimeSerial(tDTCur.wHour, tDTCur.wMinute, tDTCur.wSecond)
-        End If
-        If hDateTime2 Then
-            rs = CLng(SendMessageW(hDateTime2, DTM_GETSYSTEMTIME, 0&, tDTCur2))
-            If rs = GDT_VALID Then
-                bDTCheck2 = True
-            Else
-                bDTCheck2 = False
-            End If
-            DebugAppend "TD_DESTROYED tDTCur=" & TimeSerial(tDTCur2.wHour, tDTCur2.wMinute, tDTCur2.wSecond)
-        End If
-        If hSlider Then
-            lSliderValue = CLng(SendMessageW(hSlider, TBM_GETPOS, 0, ByVal 0&))
-        End If
+        SaveControlState
+        ForgetControls
         TaskDialogTabHookRemove Me
         RaiseEvent DialogDestroyed
         m_TDhWnd = 0
 End Select
 End Function
+
+Private Sub SaveControlState()
+'Keeps what the custom controls hold, for the Result properties when the dialog closes, and for
+'recreating them if NavigatePage leaves this page and later comes back to it.
+If hEditBox Then
+    Dim lLen As Long, sText As String
+    lLen = CLng(SendMessageW(hEditBox, WM_GETTEXTLENGTH, 0, ByVal 0&) * 2)
+    If lLen Then
+        sText = Space$(lLen)
+        Call SendMessageW(hEditBox, WM_GETTEXT, lLen, ByVal sText)
+        sEditText = StrConv(sText, vbFromUnicode)
+    End If
+End If
+If hCombo Then
+    nComboIdx = CLng(SendMessageW(hCombo, CB_GETCURSEL, 0, ByVal 0&))
+    If nCbType = cbtDropdownList Then
+        If nComboIdx >= 0 Then
+            sComboText = aComboItems(nComboIdx).sText
+        Else
+            sComboText = ""
+        End If
+    Else
+        sComboText = GetComboTextW(hEditCombo)
+    End If
+End If
+Dim rs As Long
+If hDateTime Then
+    rs = CLng(SendMessageW(hDateTime, DTM_GETSYSTEMTIME, 0&, tDTCur))
+    If rs = GDT_VALID Then
+        bDTCheck = True
+    Else
+        bDTCheck = False
+    End If
+    DebugAppend "SaveControlState tDTCur=" & TimeSerial(tDTCur.wHour, tDTCur.wMinute, tDTCur.wSecond)
+End If
+If hDateTime2 Then
+    rs = CLng(SendMessageW(hDateTime2, DTM_GETSYSTEMTIME, 0&, tDTCur2))
+    If rs = GDT_VALID Then
+        bDTCheck2 = True
+    Else
+        bDTCheck2 = False
+    End If
+    DebugAppend "SaveControlState tDTCur2=" & TimeSerial(tDTCur2.wHour, tDTCur2.wMinute, tDTCur2.wSecond)
+End If
+If hSlider Then
+    lSliderValue = CLng(SendMessageW(hSlider, TBM_GETPOS, 0, ByVal 0&))
+End If
+End Sub
+
+Private Sub LeavePage()
+'NavigatePage: this page's controls are destroyed with it. If it comes back, TDN_NAVIGATED creates
+'them again, in their initial state.
+If hUI Then UnSubclass2 hUI, AddressOf TaskDialogSubclassProc, m_TDhWnd
+ForgetControls
+End Sub
+
+Private Sub ForgetControls()
+'The custom controls are gone (page left or dialog closed). Without their handles, the properties
+'give what SaveControlState kept, and setting them sets the initial state for next time.
+hEditBox = 0: hEditCombo = 0: hComboCombo = 0: hCombo = 0
+hDateTime = 0: hDateTime2 = 0: hSlider = 0: hStatic = 0
+End Sub
 
 Private Function GetStrFromPtrW(lpszW As LongPtr) As String
   Dim sRtn As String
@@ -1757,6 +1790,8 @@ Public Property Let InputText(sText As String)
 sEditText = sText
 If hEditBox Then
     SendMessageW hEditBox, WM_SETTEXT, 0&, ByVal StrPtr(sEditText)
+Else
+    sEditInit = sText
 End If
 End Property
 Public Property Get InputBoxTextAlign() As TDInputBoxTextAlign: InputBoxTextAlign = mInputTextAlign: End Property
@@ -1935,9 +1970,9 @@ Public Property Let DateTimeValue(dt As Date)
     End If
 End Property
 Public Property Get DateTimeValue() As Date
-Call SendMessageW(hDateTime, DTM_GETSYSTEMTIME, 0&, tDTCur)
-Call SendMessageW(hDateTime2, DTM_GETSYSTEMTIME, 0&, tDTCur2)
-If hDateTime2 Then
+If hDateTime Then Call SendMessageW(hDateTime, DTM_GETSYSTEMTIME, 0&, tDTCur)
+If hDateTime2 Then Call SendMessageW(hDateTime2, DTM_GETSYSTEMTIME, 0&, tDTCur2)
+If (nDTType = dttDateTime) Or (nDTType >= dttDateTimeWithCheck) Then 'date in the first control, time in the second
     DateTimeValue = DateSerial(tDTCur.wYear, tDTCur.wMonth, tDTCur.wDay) + TimeSerial(tDTCur2.wHour, tDTCur2.wMinute, tDTCur2.wSecond)
 Else
     DateTimeValue = DateSerial(tDTCur.wYear, tDTCur.wMonth, tDTCur.wDay) + TimeSerial(tDTCur.wHour, tDTCur.wMinute, tDTCur.wSecond)
@@ -1945,6 +1980,8 @@ End If
 End Property
 
 Public Property Let DateTimeChecked(newValue As Long)
+Dim bConfig As Boolean
+bConfig = (hDateTime = 0) 'no control: this sets the initial state
 If hDateTime Then
     Call SendMessageW(hDateTime, DTM_GETSYSTEMTIME, 0&, tDTCur)
 End If
@@ -2001,22 +2038,28 @@ Else
     End If
 End If
 
+If bConfig Then
+    bDTCheckInit = bDTCheck
+    bDTCheck2Init = bDTCheck2
+End If
 End Property
 Public Property Get DateTimeChecked() As Long
 Dim rs As Long, rs2 As Long
-rs = CLng(SendMessageW(hDateTime, DTM_GETSYSTEMTIME, 0&, tDTCur))
-If hDateTime2 Then
-    rs2 = CLng(SendMessageW(hDateTime2, DTM_GETSYSTEMTIME, 0&, tDTCur2))
-End If
-If rs = GDT_VALID Then
-    bDTCheck = True
-Else
-    bDTCheck = False
-End If
-If rs2 = GDT_VALID Then
-    bDTCheck2 = True
-Else
-    bDTCheck2 = False
+If hDateTime Then 'otherwise the saved state, from SaveControlState
+    rs = CLng(SendMessageW(hDateTime, DTM_GETSYSTEMTIME, 0&, tDTCur))
+    If rs = GDT_VALID Then
+        bDTCheck = True
+    Else
+        bDTCheck = False
+    End If
+    If hDateTime2 Then
+        rs2 = CLng(SendMessageW(hDateTime2, DTM_GETSYSTEMTIME, 0&, tDTCur2))
+    End If
+    If rs2 = GDT_VALID Then
+        bDTCheck2 = True
+    Else
+        bDTCheck2 = False
+    End If
 End If
 If (nDTType = dttDateTimeWithCheck) Then 'don't return these values if there's only 1 check
     If bDTCheck And bDTCheck2 Then
@@ -2147,6 +2190,8 @@ Public Property Let SliderValue(nValue As Long)
 lSliderValue = nValue
 If hSlider Then
     Call SendMessageW(hSlider, TBM_SETPOS, 1&, ByVal lSliderValue)
+Else
+    lSliderInit = nValue
 End If
     
 End Property
@@ -2185,7 +2230,6 @@ If hCombo Then
 End If
 End Property
 Public Property Get ComboIndex() As Long
-nComboIdx = -1
 If hCombo Then
     nComboIdx = CLng(SendMessageW(hCombo, CB_GETCURSEL, 0&, ByVal 0&))
 End If
@@ -2194,6 +2238,8 @@ End Property
 Public Property Get ComboText() As String
 If hCombo Then
     ComboText = GetComboTextW(hEditCombo)
+Else
+    ComboText = sComboText
 End If
 End Property
 Public Property Let ComboText(sText As String)
@@ -2729,6 +2775,8 @@ bCBInitValid = False
 nDTType = 0
 bDTSetInit = False
 bDTCheck = False
+bDTCheckInit = False
+bDTCheck2Init = False
 bDTSetMin = False
 bDTSetMax = False
 nComboInit = -1
@@ -2783,6 +2831,7 @@ lSliderMin = 0
 lSliderMax = 10
 lSliderNTicks = 1
 lSliderValue = 0
+lSliderInit = 0
 lSliderChangeS = 1
 lSliderChangeL = 2
 nSliderTickStyle = 0
@@ -2836,6 +2885,7 @@ With uTDC
 '
     m_sInput = ""
     sEditText = ""
+    sEditInit = ""
     
 End With
 bEditPassword = False
@@ -3213,6 +3263,7 @@ lSliderMin = 0
 lSliderMax = 10
 lSliderNTicks = 1
 lSliderValue = 0
+lSliderInit = 0
 lSliderChangeS = 1
 lSliderChangeL = 2
 nSliderTickStyle = 0
@@ -3445,6 +3496,8 @@ End With
 
     
     TaskDialogTabHookRemove Me 'cTD gets TDN_NAVIGATED/TDN_DESTROYED from here on; this instance never sees TDN_DESTROYED
+    SaveControlState
+    LeavePage
     #If (VBA7 <> 0) And (TWINBASIC = 0) And (Win64 <> 0) Then
     Call SendMessageW(m_TDhWnd, TDM_NAVIGATE_PAGE, 0, uTDC2_VBA7)
     #Else
@@ -3741,6 +3794,7 @@ If hSlider Then
     SendMessageW hSlider, TBM_SETTICFREQ, lSliderNTicks, ByVal 0&
     SendMessageW hSlider, TBM_SETLINESIZE, 0, ByVal lSliderChangeS
     SendMessageW hSlider, TBM_SETPAGESIZE, 0, ByVal lSliderChangeL
+    lSliderValue = lSliderInit
     SendMessageW hSlider, TBM_SETPOS, 1&, ByVal lSliderValue
 End If
 'Subclass hSlider, AddressOf TaskDialogSubclassProc, hSlider, ObjPtr(Me)
@@ -3943,6 +3997,8 @@ lEditX = lEditX + DTOffX
                 SendMessageW hDateTime2, DTM_SETSYSTEMTIME, GDT_VALID, tDTInitial
             End If
         End If
+        bDTCheck = bDTCheckInit
+        bDTCheck2 = bDTCheck2Init
         If (nDTType = dttDateWithCheck) Or (nDTType = dttTimeWithCheck) Or (nDTType = dttDateTimeWithCheck) Or (nDTType = dttDateTimeWithCheckDateOnly) Then
             If bDTCheck = False Then
                 SendMessageW hDateTime, DTM_SETSYSTEMTIME, GDT_NONE, ByVal 0&
@@ -4072,6 +4128,7 @@ Dim i As Long
         If m_sInput <> "" Then
             SendMessageW hEditBox, EM_SETCUEBANNER, 0&, ByVal StrPtr(m_sInput)
         End If
+        sEditText = sEditInit
         If sEditText <> "" Then
             SendMessageW hEditBox, WM_SETTEXT, 0&, ByVal StrPtr(sEditText)
             SendMessageW hEditBox, EM_SETSEL, 0&, ByVal (-1&)

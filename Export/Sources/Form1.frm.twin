@@ -1682,10 +1682,7 @@ Private Declare PtrSafe Function ShellExecuteW Lib "shell32.dll" (ByVal hWnd As 
             TaskDialogPW.InputPasswordChar = 9679
         End If
     End Sub
-    
-    Private Sub Command45_Click() Handles Command45.Click
-        MyForm.Show
-    End Sub
+
     
  
 
