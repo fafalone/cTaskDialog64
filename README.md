@@ -1,10 +1,18 @@
 # cTaskDialog
-### Current Version: v1.8 Universal Compatibility Version
+### Current Version: v1.8.1 Universal Compatibility Version
 
 **Quick Start:** Add cTaskDialog.cls and mTDHelper.bas to your project-- these are the only two required files for your code.
 
 
 cTaskDialog :: A complete class wrapper for `TaskDialogIndirect`, with additional custom features, universally compatible with VB6/VBA7/twinBASIC x86/x64
+
+**Update (v1.8.1, 30 Oct 2026):**
+- Bug fix for custom controls disappearing if the same dialog is
+ loaded twice in a multipage dialog. Note: Matching the behavior 
+ of the native controls, content resets to initial load state when
+ shown again. Use the Navigated event to restore changes after 
+ saving them prior to loading a new page if you want to persist
+ changes made by the user.
 
 **Update (v1.8.0, 26 Oct 2026):**
 - Added Tab/Shift+Tab navigation support for all custom controls.
